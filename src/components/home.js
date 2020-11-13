@@ -15,8 +15,8 @@ function Home(props) {
             size="large"
             onSearch={null}/>
           <PageHeader className="site-page-header"
-            title="304CEM Blog"
-            subTitle="Welcome to the demo blog."/>
+            title="Real Estate"
+            subTitle="Real Estate APP"/>
         </div>  
         <BlogGrid />
       </div>
