@@ -50,27 +50,27 @@ class RegistrationForm extends React.Component {
 	}
 
 	onFinish = (values) => {
-    console.log('Received values of form: ', values);
-    const { confirm, ...data } = values;  // ignore the 'confirm' value in data sent
-    fetch('https://maximum-arena-3000.codio-box.uk/api/v1/users', {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: {
-            "Content-Type": "application/json"
-        }        
-    })
-    .then(status)
-    .then(json)
-    .then(data => {
-        // TODO: display success message and/or redirect
-        console.log(data);
-        alert("User added")
-    })
-    .catch(error => {
-        // TODO: show nicely formatted error message and clear form
-        alert(`Error: ${JSON.stringify(error)}`);
-    });  
-  };
+		console.log('Received values of form: ', values);
+		const { confirm, ...data } = values;  // ignore the 'confirm' value in data sent
+		fetch('https://maximum-arena-3000.codio-box.uk/api/v1/users', {
+			method: "POST",
+			body: JSON.stringify(data),
+			headers: {
+				"Content-Type": "application/json"
+			}
+		})
+			.then(status)
+			.then(json)
+			.then(data => {
+				// TODO: display success message and/or redirect
+				console.log(data);
+				alert("User added")
+			})
+			.catch(error => {
+				// TODO: show nicely formatted error message and clear form
+				alert(`Error: ${JSON.stringify(error)}`);
+			});
+	};
 
 	onFinishFailed = (errorInfo) => {
 		console.log('Failed:', errorInfo);
@@ -78,26 +78,32 @@ class RegistrationForm extends React.Component {
 
 	render() {
 		return (
-			<Form {...formItemLayout} name="register" onFinish={this.onFinish} scrollToFirstError onFinishFailed={this.onFinishFailed}>
-				<Form.Item name="email" label="E-mail" rules={emailRules}>
-					<Input />
-				</Form.Item>
-				<Form.Item name="password" label="Password" rules={passwordRules} hasFeedback>
-					<Input.Password />
-				</Form.Item>
-				<Form.Item name="confirm" label="Confirm Password" dependencies={['password']}
-					hasFeedback rules={confirmRules}>
-					<Input.Password />
-				</Form.Item>
-				<Form.Item name="username" label="Username" rules={usernameRules}>
-					<Input />
-				</Form.Item>
-				<Form.Item {...tailFormItemLayout}>
-					<Button type="primary" htmlType="submit">
-						Register
+			<>
+				<h1 align="middle" style={{ padding: '2% 20%' }}>Register</h1>
+				<Form {...formItemLayout} name="register" onFinish={this.onFinish} scrollToFirstError onFinishFailed={this.onFinishFailed}>
+					<Form.Item name="email" label="E-mail" rules={emailRules}>
+						<Input />
+					</Form.Item>
+					<Form.Item name="username" label="Username" rules={usernameRules}>
+						<Input />
+					</Form.Item>
+					<Form.Item name="password" label="Password" rules={passwordRules} hasFeedback>
+						<Input.Password />
+					</Form.Item>
+					<Form.Item name="confirm" label="Confirm Password" dependencies={['password']}
+						hasFeedback rules={confirmRules}>
+						<Input.Password />
+					</Form.Item>
+					<Form.Item name="sign_up_code" label="Sign Up Code" >
+						<Input />
+					</Form.Item>
+					<Form.Item {...tailFormItemLayout}>
+						<Button type="primary" htmlType="submit">
+							Register
 					</Button>
-				</Form.Item>
-			</Form>
+					</Form.Item>
+				</Form>
+			</>
 		);
 	};
 };
