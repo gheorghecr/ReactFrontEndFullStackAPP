@@ -51,25 +51,31 @@ function getBase64(img, callback) {
 	const reader = new FileReader();
 	reader.addEventListener('load', () => callback(reader.result));
 	reader.readAsDataURL(img);
-  }
+}
+
+const dummyRequest = ({ file, onSuccess }) => {
+	setTimeout(() => {
+	  onSuccess("ok");
+	}, 0);
+  };
 
 /**
 * Registration form component for app signup.
 */
 class RegistrationForm extends React.Component {
-
-	state = {
-		loading: false,
-	  };
-
 	constructor(props) {
 		super(props);
+		this.state = {
+			loading: false,
+		};
 		this.onFinish = this.onFinish.bind(this);
 		this.onFinishFailed = this.onFinishFailed.bind(this);
+		this.handleChange = this.handleChange.bind(this);
 		this.beforeUpload = this.beforeUpload.bind(this);
 	}
 
 	onFinish = (values) => {
+		console.log('finish')
 		console.log('Received values of form: ', values);
 		const { confirm, ...data } = values;  // ignore the 'confirm' value in data sent
 		fetch('https://maximum-arena-3000.codio-box.uk/api/users', {
@@ -109,20 +115,31 @@ class RegistrationForm extends React.Component {
 	}
 
 	handleChange = info => {
+		console.log('handle change')
+		console.log(info)
 		if (info.file.status === 'uploading') {
-		  this.setState({ loading: true });
-		  return;
+			this.setState({ loading: true });
+			return;
 		}
 		if (info.file.status === 'done') {
-		  // Get this url from response in real world.
-		  getBase64(info.file.originFileObj, imageUrl =>
-			this.setState({
-			  imageUrl,
-			  loading: false,
-			}),
-		  );
+			// Get this url from response in real world.
+			this.setState({ loading: false });
+			this.setState({ 'selectedFile': info.file });
+			getBase64(info.file.originFileObj, imageUrl =>
+				this.setState({
+					imageUrl,
+					loading: false,
+				}),
+			);
+			console.log(this.state)
 		}
-	  };
+		if (info.file.status === 'error') {
+			// Get this url from response in real world.
+			alert('Error occurred')
+			this.setState({ loading: false });
+		}
+
+	};
 
 	render() {
 		const { loading, imageUrl } = this.state;
@@ -164,7 +181,7 @@ class RegistrationForm extends React.Component {
 							listType="picture-card"
 							className="avatar-uploader"
 							showUploadList={false}
-							// action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+							customRequest={dummyRequest}
 							beforeUpload={this.beforeUpload}
 							onChange={this.handleChange}
 						>
