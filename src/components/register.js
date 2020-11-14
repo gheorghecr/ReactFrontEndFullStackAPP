@@ -1,7 +1,8 @@
 import React from 'react';
 
-import { Form, Input, Button } from 'antd';
+import { Form, Input, Button, Upload } from 'antd';
 import { status, json } from '../utilities/requestHandlers';
+import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 
 const formItemLayout = {
 	labelCol: { xs: { span: 24 }, sm: { span: 6 } },
@@ -38,21 +39,40 @@ const usernameRules = [
 	{ required: true, message: 'Please input your username!', whitespace: true }
 ]
 
+const firstNameRules = [
+	{ required: true, message: 'Please input your first name!', whitespace: true }
+]
+
+const lastNameRules = [
+	{ required: true, message: 'Please input your first name!', whitespace: true }
+]
+
+function getBase64(img, callback) {
+	const reader = new FileReader();
+	reader.addEventListener('load', () => callback(reader.result));
+	reader.readAsDataURL(img);
+  }
 
 /**
 * Registration form component for app signup.
 */
 class RegistrationForm extends React.Component {
 
+	state = {
+		loading: false,
+	  };
+
 	constructor(props) {
 		super(props);
 		this.onFinish = this.onFinish.bind(this);
+		this.onFinishFailed = this.onFinishFailed.bind(this);
+		this.beforeUpload = this.beforeUpload.bind(this);
 	}
 
 	onFinish = (values) => {
 		console.log('Received values of form: ', values);
 		const { confirm, ...data } = values;  // ignore the 'confirm' value in data sent
-		fetch('https://maximum-arena-3000.codio-box.uk/api/v1/users', {
+		fetch('https://maximum-arena-3000.codio-box.uk/api/users', {
 			method: "POST",
 			body: JSON.stringify(data),
 			headers: {
@@ -64,7 +84,7 @@ class RegistrationForm extends React.Component {
 			.then(data => {
 				// TODO: display success message and/or redirect
 				console.log(data);
-				alert("User added")
+				alert("You registered successfully!")
 			})
 			.catch(error => {
 				// TODO: show nicely formatted error message and clear form
@@ -76,12 +96,53 @@ class RegistrationForm extends React.Component {
 		console.log('Failed:', errorInfo);
 	};
 
+	beforeUpload(file) {
+		const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+		if (!isJpgOrPng) {
+			alert.error('You can only upload JPG/PNG file!');
+		}
+		const isLt2M = file.size / 1024 / 1024 < 2;
+		if (!isLt2M) {
+			alert.error('Image must smaller than 2MB!');
+		}
+		return isJpgOrPng && isLt2M;
+	}
+
+	handleChange = info => {
+		if (info.file.status === 'uploading') {
+		  this.setState({ loading: true });
+		  return;
+		}
+		if (info.file.status === 'done') {
+		  // Get this url from response in real world.
+		  getBase64(info.file.originFileObj, imageUrl =>
+			this.setState({
+			  imageUrl,
+			  loading: false,
+			}),
+		  );
+		}
+	  };
+
 	render() {
+		const { loading, imageUrl } = this.state;
+		const uploadButton = (
+			<div>
+				{loading ? <LoadingOutlined /> : <PlusOutlined />}
+				<div style={{ marginTop: 8 }}>Upload</div>
+			</div>
+		);
 		return (
 			<>
 				<h1 align="middle" style={{ padding: '2% 20%' }}>Register</h1>
 				<Form {...formItemLayout} name="register" onFinish={this.onFinish} scrollToFirstError onFinishFailed={this.onFinishFailed}>
 					<Form.Item name="email" label="E-mail" rules={emailRules}>
+						<Input />
+					</Form.Item>
+					<Form.Item name="firstName" label="First Name" rules={firstNameRules}>
+						<Input />
+					</Form.Item>
+					<Form.Item name="lastName" label="Last Name" rules={lastNameRules}>
 						<Input />
 					</Form.Item>
 					<Form.Item name="username" label="Username" rules={usernameRules}>
@@ -96,6 +157,19 @@ class RegistrationForm extends React.Component {
 					</Form.Item>
 					<Form.Item name="sign_up_code" label="Sign Up Code" >
 						<Input />
+					</Form.Item>
+					<Form.Item name="avatarURL" label="Select your avatar" >
+						<Upload
+							name="avatar"
+							listType="picture-card"
+							className="avatar-uploader"
+							showUploadList={false}
+							// action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+							beforeUpload={this.beforeUpload}
+							onChange={this.handleChange}
+						>
+							{imageUrl ? <img src={imageUrl} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
+						</Upload>
 					</Form.Item>
 					<Form.Item {...tailFormItemLayout}>
 						<Button type="primary" htmlType="submit">
