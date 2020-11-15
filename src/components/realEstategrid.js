@@ -1,9 +1,9 @@
 import React from 'react';
 import { Col, Row } from 'antd';
-import PostCard from './postcard';
+import PropertyCard from './propertyCard';
 import { status, json } from '../utilities/requestHandlers';
 
-class BlogGrid extends React.Component {
+class RealEstateGrid extends React.Component {
 
   constructor(props) {
     super(props);
@@ -13,24 +13,24 @@ class BlogGrid extends React.Component {
   }
 
   componentDidMount() {
-    fetch('https://maximum-arena-3000.codio-box.uk/api/v1/articles')
+    fetch('https://maximum-arena-3000.codio-box.uk/api/properties')
     .then(status)
     .then(json)
     .then(data => {
       this.setState({ posts: data })
     })
-    .catch(err => console.log("Error fetching articles", err));
+    .catch(err => console.log("Error fetching properties", err));
   }
 
   render() {
     if (!this.state.posts.length) {
-      return <h3>Loading posts...</h3>
+      return <h3>Loading properties...</h3>
     }
     const cardList = this.state.posts.map(post => {
       return (
         <div style={{padding:"10px"}} key={post.ID}>
           <Col span={6}>
-            <PostCard {...post} />
+            <PropertyCard {...post} />
           </Col>
         </div>
       )
@@ -43,4 +43,4 @@ class BlogGrid extends React.Component {
   }
 }
 
-export default BlogGrid;
+export default RealEstateGrid;
