@@ -3,6 +3,8 @@ import React from 'react';
 import { Form, Input, Button, Upload } from 'antd';
 import { status, json } from '../utilities/requestHandlers';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
+import { withRouter } from 'react-router-dom';
+
 
 const formItemLayout = {
 	labelCol: { xs: { span: 24 }, sm: { span: 6 } },
@@ -63,6 +65,7 @@ const dummyRequest = ({ file, onSuccess }) => {
 * Registration form component for app signup.
 */
 class RegistrationForm extends React.Component {
+	
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -78,6 +81,12 @@ class RegistrationForm extends React.Component {
 		console.log('finish')
 		console.log('Received values of form: ', values);
 		const { confirm, ...data } = values;  // ignore the 'confirm' value in data sent
+		// let file = this.state.fileSelected;
+		// console.log(file);
+		// console.log(data);
+		// data.push("file", file, file.name);
+		console.log(data);
+                
 		fetch('https://maximum-arena-3000.codio-box.uk/api/users', {
 			method: "POST",
 			body: JSON.stringify(data),
@@ -88,9 +97,8 @@ class RegistrationForm extends React.Component {
 			.then(status)
 			.then(json)
 			.then(data => {
-				// TODO: display success message and/or redirect
-				console.log(data);
 				alert("You registered successfully!")
+				console.log(data);
 			})
 			.catch(error => {
 				// TODO: show nicely formatted error message and clear form
@@ -129,16 +137,17 @@ class RegistrationForm extends React.Component {
 				this.setState({
 					imageUrl,
 					loading: false,
+					'fileSelected': info.file
 				}),
 			);
 			console.log(this.state)
+			this.props.history.push('/login')
 		}
 		if (info.file.status === 'error') {
 			// Get this url from response in real world.
 			alert('Error occurred')
 			this.setState({ loading: false });
 		}
-
 	};
 
 	render() {
@@ -149,6 +158,7 @@ class RegistrationForm extends React.Component {
 				<div style={{ marginTop: 8 }}>Upload</div>
 			</div>
 		);
+
 		return (
 			<>
 				<h1 align="middle" style={{ padding: '2% 20%' }}>Register</h1>
@@ -175,9 +185,9 @@ class RegistrationForm extends React.Component {
 					<Form.Item name="sign_up_code" label="Sign Up Code" >
 						<Input />
 					</Form.Item>
-					<Form.Item name="avatarURL" label="Select your avatar" >
+					<Form.Item name="file" label="Select your avatar" >
 						<Upload
-							name="avatar"
+							name="file"
 							listType="picture-card"
 							className="avatar-uploader"
 							showUploadList={false}
@@ -199,5 +209,5 @@ class RegistrationForm extends React.Component {
 	};
 };
 
-export default RegistrationForm;
+export default withRouter(RegistrationForm);
 
