@@ -118,13 +118,11 @@ class RegistrationForm extends React.Component {
 				
 			})
 			.catch(error => {
-				// TODO: show nicely formatted error message and clear form
-				alert(`Error: ${JSON.stringify(error)}`);
+				window.scrollTo(0, 0); 
 				this.setState({
-					errorMessage: `${JSON.stringify(error)}`,
+					errorMessage: `${JSON.stringify(error.errorMessage)}`,
 					error: true
 				});
-				
 			});
 	};
 
