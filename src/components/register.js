@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Form, Input, Button, Upload } from 'antd';
+import { Form, Input, Button, Upload, Alert} from 'antd';
 import { status, json } from '../utilities/requestHandlers';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import { withRouter } from 'react-router-dom';
@@ -55,21 +55,28 @@ function getBase64(img, callback) {
 	reader.readAsDataURL(img);
 }
 
+/**
+* Dummy request when uploading image. This is necessary because when uploading a image
+* it requires an action. And I don't use that action. 
+*/
 const dummyRequest = ({ file, onSuccess }) => {
 	setTimeout(() => {
-	  onSuccess("ok");
+		onSuccess("ok");
 	}, 0);
-  };
+};
 
 /**
 * Registration form component for app signup.
 */
 class RegistrationForm extends React.Component {
-	
+
 	constructor(props) {
 		super(props);
 		this.state = {
 			loading: false,
+			success: false, // state to check when to show the alert
+			error: false, // state to check when to show the alert
+			errorMessage: ' ', // error alert message
 		};
 		this.onFinish = this.onFinish.bind(this);
 		this.onFinishFailed = this.onFinishFailed.bind(this);
@@ -77,6 +84,9 @@ class RegistrationForm extends React.Component {
 		this.beforeUpload = this.beforeUpload.bind(this);
 	}
 
+	/**
+	* When user clicks on registering. Post data to the server.
+	*/
 	onFinish = (values) => {
 		console.log('finish')
 		console.log('Received values of form: ', values);
@@ -86,7 +96,7 @@ class RegistrationForm extends React.Component {
 		// console.log(data);
 		// data.push("file", file, file.name);
 		console.log(data);
-                
+
 		fetch('https://maximum-arena-3000.codio-box.uk/api/users', {
 			method: "POST",
 			body: JSON.stringify(data),
@@ -97,19 +107,38 @@ class RegistrationForm extends React.Component {
 			.then(status)
 			.then(json)
 			.then(data => {
-				alert("You registered successfully!")
+				this.setState({
+					success: true
+				});
 				console.log(data);
+				window.scrollTo(0, 0); 
+				setTimeout(() => {
+					this.props.history.push('/login')
+				}, 2000);
+				
 			})
 			.catch(error => {
 				// TODO: show nicely formatted error message and clear form
 				alert(`Error: ${JSON.stringify(error)}`);
+				this.setState({
+					errorMessage: `${JSON.stringify(error)}`,
+					error: true
+				});
+				
 			});
 	};
 
+	/**
+	* When there is as an error on submit.
+	*/
 	onFinishFailed = (errorInfo) => {
 		console.log('Failed:', errorInfo);
 	};
 
+	/**
+	* Before the user uploads the image (avatar), check if it is an accepted format.
+	* And also check's for a max size file.
+	*/
 	beforeUpload(file) {
 		const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
 		if (!isJpgOrPng) {
@@ -122,6 +151,10 @@ class RegistrationForm extends React.Component {
 		return isJpgOrPng && isLt2M;
 	}
 
+	/**
+	* Handles the change when the image is uploaded.
+	* Stores it on the props.
+	*/
 	handleChange = info => {
 		console.log('handle change')
 		console.log(info)
@@ -141,7 +174,6 @@ class RegistrationForm extends React.Component {
 				}),
 			);
 			console.log(this.state)
-			this.props.history.push('/login')
 		}
 		if (info.file.status === 'error') {
 			// Get this url from response in real world.
@@ -158,9 +190,36 @@ class RegistrationForm extends React.Component {
 				<div style={{ marginTop: 8 }}>Upload</div>
 			</div>
 		);
+		
+		/**
+		* Error Alert from ant design.
+		*/
+		const errorMessage = (
+			<Alert
+				message="Error"
+				description= {this.state.errorMessage}
+				type="error"
+				showIcon
+			/>
+		);
+
+		/**
+		* Success Alert from ant design.
+		*/
+		const successMessage = (
+			<Alert
+				message="Registered successfully!"
+				description="You will be redirected to login page."
+				type="success"
+				showIcon
+			/>
+		);
 
 		return (
 			<>
+				{this.state.success ? <div>{successMessage}</div> : ''}  {/* Show success message when user registered successfully*/}
+				{this.state.error ? <div>{errorMessage}</div> : ''} {/* Show error message when user NOT registered successfully*/}
+
 				<h1 align="middle" style={{ padding: '2% 20%' }}>Register</h1>
 				<Form {...formItemLayout} name="register" onFinish={this.onFinish} scrollToFirstError onFinishFailed={this.onFinishFailed}>
 					<Form.Item name="email" label="E-mail" rules={emailRules}>
@@ -168,7 +227,7 @@ class RegistrationForm extends React.Component {
 					</Form.Item>
 					<Form.Item name="firstName" label="First Name" rules={firstNameRules}>
 						<Input />
-					</Form.Item>
+					</Form.Item> 
 					<Form.Item name="lastName" label="Last Name" rules={lastNameRules}>
 						<Input />
 					</Form.Item>
@@ -206,8 +265,7 @@ class RegistrationForm extends React.Component {
 				</Form>
 			</>
 		);
-	};
-};
+	}
+}
 
 export default withRouter(RegistrationForm);
-
