@@ -31,7 +31,6 @@ class LoginForm extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			loading: false,
 			success: false, // state to check when to show the alert
 			error: false, // state to check when to show the alert
 			errorMessage: ' ', // error alert message
@@ -42,7 +41,14 @@ class LoginForm extends React.Component {
     
     static contextType = UserContext;
 
+	/**
+	* Login function, that sends the request to the server. And if successful
+	* store the user details into the context
+	*/
     login(values) {
+		this.setState({
+			error: false // remove error banner if there already
+		});
         const { username, password } = values;
         console.log(`logging in user: ${username}`)
         fetch('https://maximum-arena-3000.codio-box.uk/api/users/login', {
@@ -54,15 +60,22 @@ class LoginForm extends React.Component {
             .then(status)
             .then(json)
             .then(user => {
-                alert("User logged IN")
-                console.log('Logged in successfully');
                 console.log(user);
+                this.setState({
+					success: true
+                });
+                window.scrollTo(0, 0);
                 this.context.login(user);
+                setTimeout(() => {
+					this.props.history.push('/')
+				}, 2000);
             })
             .catch(error => {
-                // TODO: show nicely formatted error message
-                console.log('Login failed');
-                alert("Login failed")
+                window.scrollTo(0, 0); 
+				this.setState({
+					errorMessage: `${JSON.stringify(error.errorMessage)}`,
+					error: true
+				});
             });
     }
 
@@ -104,7 +117,7 @@ class LoginForm extends React.Component {
 				{this.state.error ? <div>{errorMessage}</div> : ''} {/* Show error message when user does not log in successfully*/}
 
 				<h1 align="middle" style={{ padding: '2% 20%' }}>Login</h1>
-				<Form {...formItemLayout} name="register" onFinish={this.onFinish} scrollToFirstError onFinishFailed={this.onFinishFailed}>
+				<Form {...formItemLayout} name="register" onFinish={this.login} scrollToFirstError onFinishFailed={this.onFinishFailed}>
 					<Form.Item name="username" label="Username" rules={usernameRules}>
 						<Input />
 					</Form.Item>
