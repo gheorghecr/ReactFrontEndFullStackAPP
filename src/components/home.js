@@ -1,6 +1,6 @@
 import React from 'react';
 import { PageHeader, Input } from 'antd';
-import BlogGrid from './bloggrid';
+import RealEstateGrid from './realEstategrid';
 
 const { Search } = Input;
 
@@ -18,7 +18,7 @@ function Home(props) {
             title="Real Estate"
             subTitle="Real Estate APP"/>
         </div>  
-        <BlogGrid />
+        <RealEstateGrid />
       </div>
     </>  
   );
