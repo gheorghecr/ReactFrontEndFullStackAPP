@@ -40,7 +40,7 @@ class PropertyCard extends React.Component {
         <p>Status: {this.props.status} </p>
         <p>Location: {this.props.location}</p>
         <p>Price: ${this.props.price}</p>
-        {this.props.highPriority ? <p>High Priority!</p> : ''} {/* Show error message when user NOT registered successfully*/}
+        {this.props.highPriority ? <p>High Priority!</p> : ''} {/* Show high priority label only when necessary.*/}
       </Card>
     );
   }
