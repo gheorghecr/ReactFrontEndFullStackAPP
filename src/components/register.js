@@ -73,6 +73,7 @@ class RegistrationForm extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
+			selectedFile: null,
 			loading: false,
 			success: false, // state to check when to show the alert
 			error: false, // state to check when to show the alert
@@ -91,18 +92,16 @@ class RegistrationForm extends React.Component {
 		console.log('finish')
 		console.log('Received values of form: ', values);
 		const { confirm, ...data } = values;  // ignore the 'confirm' value in data sent
-		// let file = this.state.fileSelected;
-		// console.log(file);
-		// console.log(data);
-		// data.push("file", file, file.name);
-		console.log(data);
-
+		
+		const formData = new FormData();
+		formData.append('id', '123')
+		formData.append('file', data.file.file)
+		
 		fetch('https://maximum-arena-3000.codio-box.uk/api/users', {
 			method: "POST",
-			body: JSON.stringify(data),
-			headers: {
-				"Content-Type": "application/json"
-			}
+			body: formData,
+			
+			
 		})
 			.then(status)
 			.then(json)
@@ -125,6 +124,8 @@ class RegistrationForm extends React.Component {
 				});
 			});
 	};
+
+	
 
 	/**
 	* When there is as an error on submit.
@@ -154,8 +155,6 @@ class RegistrationForm extends React.Component {
 	* Stores it on the props.
 	*/
 	handleChange = info => {
-		console.log('handle change')
-		console.log(info)
 		if (info.file.status === 'uploading') {
 			this.setState({ loading: true });
 			return;
@@ -167,11 +166,8 @@ class RegistrationForm extends React.Component {
 			getBase64(info.file.originFileObj, imageUrl =>
 				this.setState({
 					imageUrl,
-					loading: false,
-					'fileSelected': info.file
 				}),
 			);
-			console.log(this.state)
 		}
 		if (info.file.status === 'error') {
 			// Get this url from response in real world.
@@ -219,8 +215,8 @@ class RegistrationForm extends React.Component {
 				{this.state.error ? <div>{errorMessage}</div> : ''} {/* Show error message when user NOT registered successfully*/}
 
 				<h1 align="middle" style={{ padding: '2% 20%' }}>Register</h1>
-				<Form {...formItemLayout} name="register" onFinish={this.onFinish} scrollToFirstError onFinishFailed={this.onFinishFailed}>
-					<Form.Item name="email" label="E-mail" rules={emailRules}>
+				<Form {...formItemLayout} name="register"  onFinish={this.onFinish} scrollToFirstError onFinishFailed={this.onFinishFailed}>
+					{/* <Form.Item name="email" label="E-mail" rules={emailRules}>
 						<Input />
 					</Form.Item>
 					<Form.Item name="firstName" label="First Name" rules={firstNameRules}>
@@ -241,7 +237,7 @@ class RegistrationForm extends React.Component {
 					</Form.Item>
 					<Form.Item name="sign_up_code" label="Sign Up Code" >
 						<Input />
-					</Form.Item>
+					</Form.Item> */}
 					<Form.Item name="file" label="Select your avatar" >
 						<Upload
 							name="file"
