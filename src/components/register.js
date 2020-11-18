@@ -95,7 +95,8 @@ class RegistrationForm extends React.Component {
 		
 		const formData = new FormData();
 		formData.append('id', '123')
-		formData.append('file', data.file.file)
+		formData.append('file', data.file.file.originFileObj)
+		console.log(data.file)
 		
 		fetch('https://maximum-arena-3000.codio-box.uk/api/users', {
 			method: "POST",
@@ -216,7 +217,7 @@ class RegistrationForm extends React.Component {
 
 				<h1 align="middle" style={{ padding: '2% 20%' }}>Register</h1>
 				<Form {...formItemLayout} name="register"  onFinish={this.onFinish} scrollToFirstError onFinishFailed={this.onFinishFailed}>
-					{/* <Form.Item name="email" label="E-mail" rules={emailRules}>
+					<Form.Item name="email" label="E-mail" rules={emailRules}>
 						<Input />
 					</Form.Item>
 					<Form.Item name="firstName" label="First Name" rules={firstNameRules}>
@@ -237,7 +238,7 @@ class RegistrationForm extends React.Component {
 					</Form.Item>
 					<Form.Item name="sign_up_code" label="Sign Up Code" >
 						<Input />
-					</Form.Item> */}
+					</Form.Item>
 					<Form.Item name="file" label="Select your avatar" >
 						<Upload
 							name="file"
