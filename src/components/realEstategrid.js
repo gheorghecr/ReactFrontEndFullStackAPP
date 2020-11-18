@@ -2,7 +2,6 @@ import React from 'react';
 import { Col, Row } from 'antd';
 import PropertyCard from './propertyCard';
 import { status, json } from '../utilities/requestHandlers';
-
 class RealEstateGrid extends React.Component {
 
   constructor(props) {
