@@ -1,7 +1,7 @@
 import React from 'react';
+import UserContext from '../contexts/user';
 import { Card, Carousel } from 'antd';
-//import PostIcon from './posticon';
-//import NavImage from './navimage';
+import {  EditOutlined, EllipsisOutlined, MessageOutlined, DeleteOutlined  } from '@ant-design/icons';
 
 const { Meta } = Card;
 
@@ -13,8 +13,10 @@ class PropertyCard extends React.Component {
     };
   }
 
+  static contextType = UserContext;
+
   render() {
-    const postID = this.props.prop_ID;
+    const postID = this.props.prop_ID
 
     const contentStyle = {
       height: '160px',
@@ -24,13 +26,32 @@ class PropertyCard extends React.Component {
       background: '#364d79',
     };
 
+    let cardActions;
+    // Render different card actions depending if who is logged in is normal user 
+    // or an admin.
+    if (this.context.user.role === 'admin') {
+    cardActions = 
+      [
+        <MessageOutlined key="messages" />,
+        <EditOutlined key="edit" />,
+        <DeleteOutlined key="delete" />
+      ];
+    } else {
+      cardActions = 
+      [
+        <MessageOutlined key="messages"  />
+      ];
+    }
+    
+
     return (
       <Card
         style={{ width: 400 }}
         // cover={<NavImage alt={`Post ${postID}`} src={this.props.imageURL} to={`/post/${postID}`} />}
 
         hoverable={true}
-        loading={this.props.loading}>
+        loading={this.props.loading}
+        actions={cardActions}>
         <Carousel autoplay>
           <div>
             <h3 style={contentStyle}>1</h3>

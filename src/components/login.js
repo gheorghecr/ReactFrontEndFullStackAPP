@@ -65,7 +65,7 @@ class LoginForm extends React.Component {
 					success: true
                 });
                 window.scrollTo(0, 0);
-                this.context.login(user);
+				this.context.login(user);
                 setTimeout(() => {
 					this.props.history.push('/')
 				}, 2000);
