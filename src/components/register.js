@@ -111,11 +111,11 @@ class RegistrationForm extends React.Component {
 		})
 			.then(status)
 			.then(json)
-			.then(data => {
+			.then(dataFromServer => {
 				this.setState({
 					success: true
 				});
-				console.log(data);
+				console.log(dataFromServer);
 				window.scrollTo(0, 0); 
 				setTimeout(() => {
 					this.props.history.push('/login')
