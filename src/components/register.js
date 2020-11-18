@@ -100,14 +100,14 @@ class RegistrationForm extends React.Component {
 		formData.append('password', data.password)
 		formData.append('sign_up_code', data.sign_up_code)
 		formData.append('username', data.username)
-		formData.append('file', data.file.file.originFileObj)
-		console.log(data)
+		// Add file only if exists
+		if(data.file) {
+			formData.append('file', data.file.file.originFileObj)
+		}
 		
 		fetch('https://maximum-arena-3000.codio-box.uk/api/users', {
 			method: "POST",
 			body: formData,
-			
-			
 		})
 			.then(status)
 			.then(json)
