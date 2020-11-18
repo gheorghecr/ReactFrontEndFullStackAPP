@@ -32,7 +32,7 @@ class PropertyCard extends React.Component {
     if (this.context.user.role === 'admin') {
     cardActions = 
       [
-        <MessageOutlined key="messages" />,
+        <MessageOutlined key="messages" onClick={() => (alert('test'))} />,
         <EditOutlined key="edit" />,
         <DeleteOutlined key="delete" />
       ];
