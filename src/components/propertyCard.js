@@ -1,7 +1,7 @@
 import React from 'react';
 import UserContext from '../contexts/user';
 import { Card, Carousel } from 'antd';
-import {  EditOutlined, EllipsisOutlined, MessageOutlined, DeleteOutlined  } from '@ant-design/icons';
+import {  EditOutlined, MessageOutlined, DeleteOutlined, ExclamationCircleOutlined, ExclamationCircleFilled  } from '@ant-design/icons';
 
 const { Meta } = Card;
 
@@ -32,14 +32,15 @@ class PropertyCard extends React.Component {
     if (this.context.user.role === 'admin') {
     cardActions = 
       [
-        <MessageOutlined key="messages" onClick={() => (alert('test'))} />,
-        <EditOutlined key="edit" />,
-        <DeleteOutlined key="delete" />
+        <MessageOutlined key="messages"  style={{ color: 'steelblue' }} onClick={() => (alert('test'))} />,
+        <EditOutlined key="edit"  style={{ color: 'steelblue' }}/>,
+        <ExclamationCircleOutlined key="markHighPriority" style={{ color: this.props.highPriority ? 'red' : 'steelblue' }}/>,
+        <DeleteOutlined key="delete"  style={{ color: 'steelblue' }} />
       ];
     } else {
       cardActions = 
       [
-        <MessageOutlined key="messages"  />
+        <MessageOutlined key="messages"  style={{ color: 'steelblue' }} />
       ];
     }
     
@@ -74,7 +75,7 @@ class PropertyCard extends React.Component {
         <p>Status: {this.props.status} </p>
         <p>Location: {this.props.location}</p>
         <p>Price: ${this.props.price}</p>
-        {this.props.highPriority ? <p>High Priority!</p> : ''} {/* Show high priority label only when necessary.*/}
+        {this.props.highPriority ? <p style={{ color: this.props.highPriority ? 'red' : 'steelblue' }}>High Priority!</p> : ''} {/* Show high priority label only when necessary.*/}
       </Card>
     );
   }
