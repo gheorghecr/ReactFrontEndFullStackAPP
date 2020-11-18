@@ -94,9 +94,14 @@ class RegistrationForm extends React.Component {
 		const { confirm, ...data } = values;  // ignore the 'confirm' value in data sent
 		
 		const formData = new FormData();
-		formData.append('id', '123')
+		formData.append('email', data.email)
+		formData.append('firstName', data.firstName)
+		formData.append('lastName', data.lastName)
+		formData.append('password', data.password)
+		formData.append('sign_up_code', data.sign_up_code)
+		formData.append('username', data.username)
 		formData.append('file', data.file.file.originFileObj)
-		console.log(data.file)
+		console.log(data)
 		
 		fetch('https://maximum-arena-3000.codio-box.uk/api/users', {
 			method: "POST",
