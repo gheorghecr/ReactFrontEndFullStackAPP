@@ -6,6 +6,7 @@ import Account from './components/account';
 import Register from './components/register';
 import Login from './components/login';
 import Home from './components/home';
+import AddPropertyForm from './components/addProperty';
 
 import UserContext from './contexts/user';
 
@@ -58,6 +59,7 @@ class App extends React.Component {
                 <Route path="/account" children={<Account />} />
                 <Route path="/register" children={<Register />} />
                 <Route path="/login" children={<Login />} />
+                <Route path="/addProperty" children={<AddPropertyForm />} />
                 {/* <Route path="/post/:id" children={<Post />} />
                 
                 */}
