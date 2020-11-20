@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Form, Input, Button, Upload, Alert, Select, } from 'antd';
 import { status, json } from '../utilities/requestHandlers';
-import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
+import { LoadingOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import { withRouter } from 'react-router-dom';
 
 const { TextArea } = Input;
@@ -42,16 +42,6 @@ function getBase64(img, callback) {
 }
 
 /**
-* Dummy request when uploading image. This is necessary because when uploading a image
-* it requires an action. And I don't use that action. 
-*/
-const dummyRequest = ({ file, onSuccess }) => {
-	setTimeout(() => {
-		onSuccess("ok");
-	}, 0);
-};
-
-/**
 * Registration form component for app signup.
 */
 class AddPropertyForm extends React.Component {
@@ -59,16 +49,47 @@ class AddPropertyForm extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			selectedFile: null,
-			loading: false,
 			success: false, // state to check when to show the alert
 			error: false, // state to check when to show the alert
 			errorMessage: ' ', // error alert message
+			fileList: [],
+			// photosList: {
+			// 	action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
+			// 	onChange({ file, fileList }) {
+			// 		if (file.status !== 'uploading') {
+			// 			//console.log(file, fileList);
+			// 			this.setState({
+			// 				fileList: fileList
+			// 			})
+			// 		}
+			// 	},
+			// 	defaultFileList: [
+			// 		{
+			// 			uid: '1',
+			// 			name: 'xxx.png',
+			// 			status: 'done',
+			// 			response: 'Server Error 500', // custom error message to show
+			// 			url: 'http://www.baidu.com/xxx.png',
+			// 		},
+			// 		{
+			// 			uid: '2',
+			// 			name: 'yyy.png',
+			// 			status: 'done',
+			// 			url: 'http://www.baidu.com/yyy.png',
+			// 		},
+			// 		{
+			// 			uid: '3',
+			// 			name: 'zzz.png',
+			// 			status: 'error',
+			// 			response: 'Server Error 500', // custom error message to show
+			// 			url: 'http://www.baidu.com/zzz.png',
+			// 		},
+			// 	],
+			// }
 		};
 		this.onFinish = this.onFinish.bind(this);
 		this.onFinishFailed = this.onFinishFailed.bind(this);
-		this.handleChange = this.handleChange.bind(this);
-		this.beforeUpload = this.beforeUpload.bind(this);
+		this.onChange = this.onChange.bind(this);
 	}
 
 	/**
@@ -77,7 +98,7 @@ class AddPropertyForm extends React.Component {
 	onFinish = (values) => {
 		console.log('Received values of add property form: ', values);
 		const { confirm, ...data } = values;  // ignore the 'confirm' value in data sent
-		
+
 		const formData = new FormData();
 		// TODO: Add the seler ID
 		formData.append('email', data.email)
@@ -87,34 +108,34 @@ class AddPropertyForm extends React.Component {
 		formData.append('sign_up_code', data.sign_up_code)
 		formData.append('username', data.username)
 		// Add file only if exists
-		if(data.file) {
+		if (data.file) {
 			formData.append('file', data.file.file.originFileObj)
 		}
-		
-		fetch('https://maximum-arena-3000.codio-box.uk/api/properties', {
-			method: "POST",
-			body: formData,
-		})
-			.then(status)
-			.then(json)
-			.then(dataFromServer => {
-				this.setState({
-					success: true
-				});
-				console.log(dataFromServer);
-				window.scrollTo(0, 0); 
-				setTimeout(() => {
-					this.props.history.push('/login')
-				}, 2000);
-				
-			})
-			.catch(error => {
-				window.scrollTo(0, 0); 
-				this.setState({
-					errorMessage: `${JSON.stringify(error.errorMessage)}`,
-					error: true
-				});
-			});
+
+		// fetch('https://maximum-arena-3000.codio-box.uk/api/properties', {
+		// 	method: "POST",
+		// 	body: formData,
+		// })
+		// 	.then(status)
+		// 	.then(json)
+		// 	.then(dataFromServer => {
+		// 		this.setState({
+		// 			success: true
+		// 		});
+		// 		console.log(dataFromServer);
+		// 		window.scrollTo(0, 0);
+		// 		setTimeout(() => {
+		// 			this.props.history.push('/login')
+		// 		}, 2000);
+
+		// 	})
+		// 	.catch(error => {
+		// 		window.scrollTo(0, 0);
+		// 		this.setState({
+		// 			errorMessage: `${JSON.stringify(error.errorMessage)}`,
+		// 			error: true
+		// 		});
+		// 	});
 	};
 
 	/**
@@ -125,46 +146,17 @@ class AddPropertyForm extends React.Component {
 	};
 
 	/**
-	* Before the user uploads the image (avatar), check if it is an accepted format.
-	* And also check's for a max size file.
-	*/
-	beforeUpload(file) {
-		const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
-		if (!isJpgOrPng) {
-			alert.error('You can only upload JPG/PNG file!');
-		}
-		const isLt2M = file.size / 1024 / 1024 < 2;
-		if (!isLt2M) {
-			alert.error('Image must smaller than 2MB!');
-		}
-		return isJpgOrPng && isLt2M;
-	}
-
-	/**
 	* Handles the change when the image is uploaded.
-	* Stores it on the props.
+	* Stores it on the state.fileList.
 	*/
-	handleChange = info => {
-		if (info.file.status === 'uploading') {
-			this.setState({ loading: true });
-			return;
+	onChange({ file, fileList }) {
+		if (file.status !== 'done') {
+			this.setState({
+				fileList: fileList
+			})
 		}
-		if (info.file.status === 'done') {
-			// Get this url from response in real world.
-			this.setState({ loading: false });
-			this.setState({ 'selectedFile': info.file });
-			getBase64(info.file.originFileObj, imageUrl =>
-				this.setState({
-					imageUrl,
-				}),
-			);
-		}
-		if (info.file.status === 'error') {
-			// Get this url from response in real world.
-			alert('Error occurred')
-			this.setState({ loading: false });
-		}
-	};
+		console.log(this.state.fileList)
+	}
 
 	render() {
 		const { loading, imageUrl } = this.state;
@@ -174,14 +166,14 @@ class AddPropertyForm extends React.Component {
 				<div style={{ marginTop: 8 }}>Upload</div>
 			</div>
 		);
-		
+
 		/**
 		* Error Alert from ant design.
 		*/
 		const errorMessage = (
 			<Alert
 				message="Error"
-				description= {this.state.errorMessage}
+				description={this.state.errorMessage}
 				type="error"
 				showIcon
 			/>
@@ -199,39 +191,45 @@ class AddPropertyForm extends React.Component {
 			/>
 		);
 
+		const photosActions = {
+			onChange: this.onChange,
+			beforeUpload: () => false // upload manually
+		};
+		
+
 		return (
 			<>
 				{this.state.success ? <div>{successMessage}</div> : ''}  {/* Show success message when property added successfully*/}
 				{this.state.error ? <div>{errorMessage}</div> : ''} {/* Show error message when property NOT added  successfully*/}
 
 				<h1 align="middle" style={{ padding: '2% 20%' }}>Add property</h1>
-				<Form {...formItemLayout} name="register"  onFinish={this.onFinish} scrollToFirstError onFinishFailed={this.onFinishFailed}>
+				<Form {...formItemLayout} name="register" onFinish={this.onFinish} scrollToFirstError onFinishFailed={this.onFinishFailed}>
 					<Form.Item name="title" label="Title" rules={titleRules} required tooltip="This is a required field">
 						<Input />
 					</Form.Item>
 					<Form.Item name="description" label="Description" rules={descriptionRules} required tooltip="This is a required field" >
 						<TextArea rows={6} />
-					</Form.Item> 
-                    <Form.Item name="price" label="Price" rules={priceRules} required tooltip="This is a required field">
-						<Input />
 					</Form.Item>
 					<Form.Item name="location" label="Location" rules={locationRules} required tooltip="This is a required field">
-						<Input />
+						<TextArea rows={3} />
 					</Form.Item>
-					<Form.Item name="visibility" label="Visibility"  hasFeedback tooltip="Visible to all users?">
-						<Select defaultValue="0">
+					<Form.Item name="price" label="Price" rules={priceRules} required tooltip="This is a required field">
+						<Input style={{ width: '20%' }} />
+					</Form.Item>
+					<Form.Item name="visibility" label="Visibility" hasFeedback tooltip="Visible to all users?">
+						<Select defaultValue="0" style={{ width: '20%' }}>
 							<Option value="1">Yes</Option>
 							<Option value="0">No</Option>
 						</Select>
 					</Form.Item>
 					<Form.Item name="highPriority" label="High Priority" tooltip="Is the high priority property?" >
-						<Select defaultValue="0">
+						<Select defaultValue="0" style={{ width: '20%' }}>
 							<Option value="1">Yes</Option>
 							<Option value="0">No</Option>
 						</Select>
 					</Form.Item>
 					<Form.Item name="file" label="Select your avatar" >
-						<Upload
+						{/* <Upload
 							name="file"
 							listType="picture-card"
 							className="avatar-uploader"
@@ -239,8 +237,12 @@ class AddPropertyForm extends React.Component {
 							customRequest={dummyRequest}
 							beforeUpload={this.beforeUpload}
 							onChange={this.handleChange}
+
 						>
 							{imageUrl ? <img src={imageUrl} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
+						</Upload> */}
+						<Upload {...photosActions}>
+							<Button icon={<UploadOutlined />}>Upload</Button>
 						</Upload>
 					</Form.Item>
 					<Form.Item {...tailFormItemLayout}>
