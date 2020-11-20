@@ -48,7 +48,7 @@ class RealEstateGrid extends React.Component {
     }
     const cardList = this.state.posts.map(post => {
       return (
-        <div style={{ padding: "10px" }} key={post.ID}>
+        <div style={{ padding: "10px" }} key={post.prop_ID}>
           <Col span={6}>
             <PropertyCard {...post} />
           </Col>
