@@ -1,7 +1,8 @@
 import React from 'react';
+import { withRouter } from 'react-router-dom';
+
 import UserContext from '../contexts/user';
 import { Card, Carousel } from 'antd';
-import { withRouter } from 'react-router-dom';
 import {  EditOutlined, MessageOutlined, DeleteOutlined, ExclamationCircleOutlined, ExclamationCircleFilled  } from '@ant-design/icons';
 
 const { Meta } = Card;
@@ -30,10 +31,12 @@ class PropertyCard extends React.Component {
     let cardActions;
     // Render different card actions depending if who is logged in is normal user 
     // or an admin.
+    const { history } = this.props;
+
     if (this.context.user.role === 'admin') {
     cardActions = 
       [
-        <MessageOutlined key="messages"  style={{ color: 'steelblue' }} onClick={() => (alert('test'))} />,
+        <MessageOutlined key="messages"  style={{ color: 'steelblue' }} onClick={() => (history.push("/addProperty"))} />,
         <EditOutlined key="edit"  style={{ color: 'steelblue' }}/>,
         <ExclamationCircleOutlined key="markHighPriority" style={{ color: this.props.highPriority ? 'red' : 'steelblue' }}/>,
         <DeleteOutlined key="delete"  style={{ color: 'steelblue' }} />
@@ -41,7 +44,7 @@ class PropertyCard extends React.Component {
     } else {
       cardActions = 
       [
-        <MessageOutlined key="messages"  style={{ color: 'steelblue' }} onClick={() => (alert('test'))} />
+        <MessageOutlined key="messages"  style={{ color: 'steelblue' }} onClick={() => (history.push("/addProperty"))} />
       ];
     }
     
