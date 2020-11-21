@@ -1,5 +1,6 @@
 import React from 'react';
 import { Col, Row } from 'antd';
+import { withRouter } from 'react-router-dom';
 import PropertyCard from './propertyCard';
 import { status, json } from '../utilities/requestHandlers';
 class RealEstateGrid extends React.Component {
@@ -50,7 +51,7 @@ class RealEstateGrid extends React.Component {
       return (
         <div style={{ padding: "10px" }} key={post.prop_ID}>
           <Col span={6}>
-            <PropertyCard {...post} />
+            <PropertyCard {...post} history={this.props.history} />
           </Col>
         </div>
       )
@@ -64,4 +65,4 @@ class RealEstateGrid extends React.Component {
   }
 }
 
-export default RealEstateGrid;
+export default withRouter(RealEstateGrid);
