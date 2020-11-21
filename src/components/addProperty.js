@@ -73,19 +73,17 @@ class AddPropertyForm extends React.Component {
 			formData.append(key, value)
 		}
 
-		const currentUserID = this.context.user.userID || 1; 
-
-		formData.append('sellerID',currentUserID); // Seller ID is the current user. (who is adding this)
-
 		// Adding all files to the form data
 		for (let file of this.state.fileList) {
 			formData.append('file', file.originFileObj)
-			console.log(file.originFileObj)
 		}
 
 		fetch('https://maximum-arena-3000.codio-box.uk/api/properties', {
 			method: "POST",
 			body: formData,
+			headers: {
+                "Authorization": "Basic " + btoa(this.context.user.userID + ":" + this.context.user.password)
+            }
 		})
 			.then(status)
 			.then(json)
@@ -96,7 +94,7 @@ class AddPropertyForm extends React.Component {
 				console.log(dataFromServer);
 				window.scrollTo(0, 0);
 				setTimeout(() => {
-					this.props.history.push('/login')
+					//this.props.history.push('/login')
 				}, 2000);
 
 			})
@@ -155,8 +153,8 @@ class AddPropertyForm extends React.Component {
 		*/
 		const successMessage = (
 			<Alert
-				message="Registered successfully!"
-				description="You will be redirected to login page."
+				message="Property added successfully!"
+				description=""
 				type="success"
 				showIcon
 			/>
@@ -196,6 +194,13 @@ class AddPropertyForm extends React.Component {
 						<Select  style={{ width: '20%' }}>
 							<Option value="1">Yes</Option>
 							<Option value="0">No</Option>
+						</Select>
+					</Form.Item>
+					<Form.Item name="status" label="Status" tooltip="Status of the property?" >
+						<Select  style={{ width: '20%' }}>
+							<Option value="For Sale">For Sale</Option>
+							<Option value="Under Offer">Under Offer</Option>
+							<Option value="Sold">Sold</Option>
 						</Select>
 					</Form.Item>
 					<Form.Item name="file" label="Select your avatar" >
