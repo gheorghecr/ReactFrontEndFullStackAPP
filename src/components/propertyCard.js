@@ -1,6 +1,7 @@
 import React from 'react';
 import UserContext from '../contexts/user';
 import { Card, Carousel } from 'antd';
+import { withRouter } from 'react-router-dom';
 import {  EditOutlined, MessageOutlined, DeleteOutlined, ExclamationCircleOutlined, ExclamationCircleFilled  } from '@ant-design/icons';
 
 const { Meta } = Card;
@@ -40,7 +41,7 @@ class PropertyCard extends React.Component {
     } else {
       cardActions = 
       [
-        <MessageOutlined key="messages"  style={{ color: 'steelblue' }} />
+        <MessageOutlined key="messages"  style={{ color: 'steelblue' }} onClick={() => (alert('test'))} />
       ];
     }
     
