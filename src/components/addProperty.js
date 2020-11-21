@@ -3,7 +3,7 @@ import UserContext from '../contexts/user';
 
 import { Form, Input, Button, Upload, Alert, Select, InputNumber } from 'antd';
 import { status, json } from '../utilities/requestHandlers';
-import { LoadingOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
+import { UploadOutlined } from '@ant-design/icons';
 import { withRouter } from 'react-router-dom';
 
 const { TextArea } = Input;
@@ -64,9 +64,6 @@ class AddPropertyForm extends React.Component {
 
 		delete data.file; //I don't use the file from here
 
-		
-		// console.log(this.state.fileList)
-
 		const formData = new FormData();
 
 		for (const [ key, value ] of Object.entries(data)) {
@@ -82,7 +79,7 @@ class AddPropertyForm extends React.Component {
 			method: "POST",
 			body: formData,
 			headers: {
-                "Authorization": "Basic " + btoa(this.context.user.userID + ":" + this.context.user.password)
+                "Authorization": "Basic " + btoa(this.context.user.username + ":" + this.context.user.password)
             }
 		})
 			.then(status)
@@ -94,7 +91,7 @@ class AddPropertyForm extends React.Component {
 				console.log(dataFromServer);
 				window.scrollTo(0, 0);
 				setTimeout(() => {
-					//this.props.history.push('/login')
+					this.props.history.push('/')
 				}, 2000);
 
 			})
@@ -128,13 +125,7 @@ class AddPropertyForm extends React.Component {
 	}
 
 	render() {
-		const { loading, imageUrl } = this.state;
-		const uploadButton = (
-			<div>
-				{loading ? <LoadingOutlined /> : <PlusOutlined />}
-				<div style={{ marginTop: 8 }}>Upload</div>
-			</div>
-		);
+		const { loading } = this.state;
 
 		/**
 		* Error Alert from ant design.
