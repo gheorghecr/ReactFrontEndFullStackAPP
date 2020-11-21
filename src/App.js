@@ -27,15 +27,16 @@ class App extends React.Component {
     this.logout = this.logout.bind(this);
   }
 
-  login(user) {
+  login(user, password) {
     console.log("User is now being set on the context");
     user.loggedIn = true;
-    this.setState({ user: user });
+    user.password = password;
+    this.setState({user:user});
   }
 
   logout() {
     console.log("Removing user from the app context");
-    this.setState({ user: { loggedIn: false } });
+    this.setState({user: {loggedIn:false}});
   }
 
   render() {
