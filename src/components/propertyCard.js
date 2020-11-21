@@ -18,6 +18,7 @@ class PropertyCard extends React.Component {
       errorMessage: ' ', // error alert message
     };
     this.toggleHighPriority = this.toggleHighPriority.bind(this);
+    this.deleteProperty = this.deleteProperty.bind(this);
   }
 
   static contextType = UserContext;
@@ -49,7 +50,42 @@ class PropertyCard extends React.Component {
         // After 2 seconds remove success message
         setTimeout(() => {
           this.setState({
-            success: true,
+            success: false,
+          });
+        }, 2000);
+        console.log(dataFromServer);
+      })
+      .catch(error => {
+        window.scrollTo(0, 0);
+        this.setState({
+          errorMessage: `${JSON.stringify(error.errorMessage)}`,
+          error: true
+        });
+      });
+  }
+
+  /**
+  * Deletes an property!
+  */
+  deleteProperty() {
+    fetch(`https://maximum-arena-3000.codio-box.uk/api/properties/${this.props.prop_ID}`, {
+      method: "DELETE",
+      body: null,
+      headers: {
+        "Authorization": "Basic " + btoa(this.context.user.username + ":" + this.context.user.password)
+      }
+    })
+      .then(status)
+      .then(json)
+      .then(dataFromServer => {
+        this.setState({
+          success: true,
+        });
+        window.scrollTo(0, 0);
+        // After 2 seconds remove success message
+        setTimeout(() => {
+          this.setState({
+            success: false,
           });
         }, 2000);
         console.log(dataFromServer);
@@ -84,7 +120,7 @@ class PropertyCard extends React.Component {
           <MessageOutlined key="messages" style={{ color: 'steelblue' }} onClick={() => (history.push("/addProperty"))} />,
           <EditOutlined key="edit" style={{ color: 'steelblue' }} />,
           <ExclamationCircleOutlined key="markHighPriority" onClick={() => (this.toggleHighPriority())} style={{ color: this.state.highPriority ? 'red' : 'steelblue' }} />,
-          <DeleteOutlined key="delete" style={{ color: 'steelblue' }} />
+          <DeleteOutlined key="delete" onClick={() => (this.deleteProperty())} style={{ color: 'steelblue' }} />
         ];
     } else {
       cardActions =
