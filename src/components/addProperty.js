@@ -1,6 +1,7 @@
 import React from 'react';
+import UserContext from '../contexts/user';
 
-import { Form, Input, Button, Upload, Alert, Select, } from 'antd';
+import { Form, Input, Button, Upload, Alert, Select, InputNumber } from 'antd';
 import { status, json } from '../utilities/requestHandlers';
 import { LoadingOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import { withRouter } from 'react-router-dom';
@@ -31,15 +32,8 @@ const locationRules = [
 ]
 
 const priceRules = [
-	{ type: 'number', message: 'The input is not valid E-mail!' },
-	{ required: true, message: 'Please input an price for the property!', whitespace: true }
+	{ required: true, message: 'Please input an price for the property!' }
 ]
-
-function getBase64(img, callback) {
-	const reader = new FileReader();
-	reader.addEventListener('load', () => callback(reader.result));
-	reader.readAsDataURL(img);
-}
 
 /**
 * Registration form component for app signup.
@@ -53,44 +47,13 @@ class AddPropertyForm extends React.Component {
 			error: false, // state to check when to show the alert
 			errorMessage: ' ', // error alert message
 			fileList: [],
-			// photosList: {
-			// 	action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
-			// 	onChange({ file, fileList }) {
-			// 		if (file.status !== 'uploading') {
-			// 			//console.log(file, fileList);
-			// 			this.setState({
-			// 				fileList: fileList
-			// 			})
-			// 		}
-			// 	},
-			// 	defaultFileList: [
-			// 		{
-			// 			uid: '1',
-			// 			name: 'xxx.png',
-			// 			status: 'done',
-			// 			response: 'Server Error 500', // custom error message to show
-			// 			url: 'http://www.baidu.com/xxx.png',
-			// 		},
-			// 		{
-			// 			uid: '2',
-			// 			name: 'yyy.png',
-			// 			status: 'done',
-			// 			url: 'http://www.baidu.com/yyy.png',
-			// 		},
-			// 		{
-			// 			uid: '3',
-			// 			name: 'zzz.png',
-			// 			status: 'error',
-			// 			response: 'Server Error 500', // custom error message to show
-			// 			url: 'http://www.baidu.com/zzz.png',
-			// 		},
-			// 	],
-			// }
 		};
 		this.onFinish = this.onFinish.bind(this);
 		this.onFinishFailed = this.onFinishFailed.bind(this);
 		this.onChange = this.onChange.bind(this);
 	}
+
+	static contextType = UserContext;
 
 	/**
 	* When user clicks on registering. Post data to the server.
@@ -99,43 +62,51 @@ class AddPropertyForm extends React.Component {
 		console.log('Received values of add property form: ', values);
 		const { confirm, ...data } = values;  // ignore the 'confirm' value in data sent
 
+		delete data.file; //I don't use the file from here
+
+		
+		// console.log(this.state.fileList)
+
 		const formData = new FormData();
-		// TODO: Add the seler ID
-		formData.append('email', data.email)
-		formData.append('firstName', data.firstName)
-		formData.append('lastName', data.lastName)
-		formData.append('password', data.password)
-		formData.append('sign_up_code', data.sign_up_code)
-		formData.append('username', data.username)
-		// Add file only if exists
-		if (data.file) {
-			formData.append('file', data.file.file.originFileObj)
+
+		for (const [ key, value ] of Object.entries(data)) {
+			formData.append(key, value)
 		}
 
-		// fetch('https://maximum-arena-3000.codio-box.uk/api/properties', {
-		// 	method: "POST",
-		// 	body: formData,
-		// })
-		// 	.then(status)
-		// 	.then(json)
-		// 	.then(dataFromServer => {
-		// 		this.setState({
-		// 			success: true
-		// 		});
-		// 		console.log(dataFromServer);
-		// 		window.scrollTo(0, 0);
-		// 		setTimeout(() => {
-		// 			this.props.history.push('/login')
-		// 		}, 2000);
+		const currentUserID = this.context.user.userID || 1; 
 
-		// 	})
-		// 	.catch(error => {
-		// 		window.scrollTo(0, 0);
-		// 		this.setState({
-		// 			errorMessage: `${JSON.stringify(error.errorMessage)}`,
-		// 			error: true
-		// 		});
-		// 	});
+		formData.append('sellerID',currentUserID); // Seller ID is the current user. (who is adding this)
+
+		// Adding all files to the form data
+		for (let file of this.state.fileList) {
+			formData.append('file', file.originFileObj)
+			console.log(file.originFileObj)
+		}
+
+		fetch('https://maximum-arena-3000.codio-box.uk/api/properties', {
+			method: "POST",
+			body: formData,
+		})
+			.then(status)
+			.then(json)
+			.then(dataFromServer => {
+				this.setState({
+					success: true
+				});
+				console.log(dataFromServer);
+				window.scrollTo(0, 0);
+				setTimeout(() => {
+					this.props.history.push('/login')
+				}, 2000);
+
+			})
+			.catch(error => {
+				window.scrollTo(0, 0);
+				this.setState({
+					errorMessage: `${JSON.stringify(error.errorMessage)}`,
+					error: true
+				});
+			});
 	};
 
 	/**
@@ -195,7 +166,6 @@ class AddPropertyForm extends React.Component {
 			onChange: this.onChange,
 			beforeUpload: () => false // upload manually
 		};
-		
 
 		return (
 			<>
@@ -214,33 +184,21 @@ class AddPropertyForm extends React.Component {
 						<TextArea rows={3} />
 					</Form.Item>
 					<Form.Item name="price" label="Price" rules={priceRules} required tooltip="This is a required field">
-						<Input style={{ width: '20%' }} />
+						<InputNumber min={1} max={100000000000000} style={{ width: '20%' }} />
 					</Form.Item>
-					<Form.Item name="visibility" label="Visibility" hasFeedback tooltip="Visible to all users?">
-						<Select defaultValue="0" style={{ width: '20%' }}>
+					<Form.Item name="visibility" label="Visibility" tooltip="Visible to all users?">
+						<Select style={{ width: '20%' }}>
 							<Option value="1">Yes</Option>
 							<Option value="0">No</Option>
 						</Select>
 					</Form.Item>
 					<Form.Item name="highPriority" label="High Priority" tooltip="Is the high priority property?" >
-						<Select defaultValue="0" style={{ width: '20%' }}>
+						<Select  style={{ width: '20%' }}>
 							<Option value="1">Yes</Option>
 							<Option value="0">No</Option>
 						</Select>
 					</Form.Item>
 					<Form.Item name="file" label="Select your avatar" >
-						{/* <Upload
-							name="file"
-							listType="picture-card"
-							className="avatar-uploader"
-							showUploadList={false}
-							customRequest={dummyRequest}
-							beforeUpload={this.beforeUpload}
-							onChange={this.handleChange}
-
-						>
-							{imageUrl ? <img src={imageUrl} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
-						</Upload> */}
 						<Upload {...photosActions}>
 							<Button icon={<UploadOutlined />}>Upload</Button>
 						</Upload>
