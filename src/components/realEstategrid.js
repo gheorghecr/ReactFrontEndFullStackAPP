@@ -13,7 +13,7 @@ class RealEstateGrid extends React.Component {
       loading: true,
       success: false, // state to check when to show the alert
       successMessage: '', // success alert message
-      successDescription: '', 
+      successDescription: '',
       error: false, // state to check when to show the alert
       errorMessage: ' ', // error alert message
       errorDescription: '',
@@ -66,33 +66,33 @@ class RealEstateGrid extends React.Component {
     });
   }
 
- /**
- * Method to popUP a error message with a custom message.
- *
- * @param {string} title Title for the error message.
- * @param {string} description Description for the error message.
- */
- errorMessage = (title, description) => {
-  this.setState({
-    error: true,
-    errorMessage: title,
-    errorDescription: description,
-  });
-}
+  /**
+  * Method to popUP a error message with a custom message.
+  *
+  * @param {string} title Title for the error message.
+  * @param {string} description Description for the error message.
+  */
+  errorMessage = (title, description) => {
+    this.setState({
+      error: true,
+      errorMessage: title,
+      errorDescription: description,
+    });
+  }
 
-/**
- * Method to popUP a error message with a custom message.
- *
- * @param {string} title Title for the error message.
- * @param {string} description Description for the error message.
- */
-successMessage = (title, description) => {
-  this.setState({
-    success: true,
-    successMessage: title,
-    successDescription: description,
-  });
-}
+  /**
+   * Method to popUP a error message with a custom message.
+   *
+   * @param {string} title Title for the error message.
+   * @param {string} description Description for the error message.
+   */
+  successMessage = (title, description) => {
+    this.setState({
+      success: true,
+      successMessage: title,
+      successDescription: description,
+    });
+  }
 
   /**
   * Fetch all the properties
@@ -100,7 +100,7 @@ successMessage = (title, description) => {
   componentDidMount() {
     let fetchLink;
     // Fetch request depends on the user role
-    if(this.context.user.role === 'admin') {
+    if (this.context.user.role === 'admin') {
       fetchLink = 'https://maximum-arena-3000.codio-box.uk/api/properties/adminview';
     } else {
       fetchLink = 'https://maximum-arena-3000.codio-box.uk/api/properties';
@@ -118,9 +118,13 @@ successMessage = (title, description) => {
       .then(data => {
         this.setState({ posts: data })
         this.setState({ loading: false })
-        console.log(data)
       })
-      .catch(err => console.log("Error fetching properties", err));
+      .catch(error => {
+        console.log("Error fetching properties", error);
+        setTimeout(() => {
+					this.componentDidMount(); // keep requesting for properties
+				}, 2000);
+      });
   }
 
   render() {
@@ -142,8 +146,8 @@ successMessage = (title, description) => {
     */
     const successMessage = (
       <Alert
-        message = {this.state.successMessage}
-        description= {this.state.successDescription}
+        message={this.state.successMessage}
+        description={this.state.successDescription}
         type="success"
         showIcon
       />
@@ -175,7 +179,7 @@ successMessage = (title, description) => {
       return (
         <div style={{ padding: "10px" }} key={post.prop_ID}>
           <Col span={6}>
-            <PropertyCard {...post} history={this.props.history} deleteProperty={this.deleteProperty} successMessage={this.successMessage} errorMessage={this.errorMessage}/>
+            <PropertyCard {...post} history={this.props.history} deleteProperty={this.deleteProperty} successMessage={this.successMessage} errorMessage={this.errorMessage} />
           </Col>
         </div>
       )
