@@ -2,7 +2,7 @@ import React from 'react';
 import { withRouter } from 'react-router-dom';
 import { status, json } from '../utilities/requestHandlers';
 import UserContext from '../contexts/user';
-import { Card, Carousel, Alert } from 'antd';
+import { Card, Carousel} from 'antd';
 import { EditOutlined, MessageOutlined, DeleteOutlined, ExclamationCircleOutlined, ExclamationCircleFilled } from '@ant-design/icons';
 
 const { Meta } = Card;
@@ -13,12 +13,9 @@ class PropertyCard extends React.Component {
     super(props);
     this.state = {
       highPriority: this.props.highPriority,
-      success: false, // state to check when to show the alert
-      error: false, // state to check when to show the alert
-      errorMessage: ' ', // error alert message
     };
     this.toggleHighPriority = this.toggleHighPriority.bind(this);
-    this.deleteProperty = this.deleteProperty.bind(this);
+    // this.deleteProperty = this.deleteProperty.bind(this);
   }
 
   static contextType = UserContext;
@@ -64,40 +61,40 @@ class PropertyCard extends React.Component {
       });
   }
 
-  /**
-  * Deletes an property!
-  */
-  deleteProperty() {
-    fetch(`https://maximum-arena-3000.codio-box.uk/api/properties/${this.props.prop_ID}`, {
-      method: "DELETE",
-      body: null,
-      headers: {
-        "Authorization": "Basic " + btoa(this.context.user.username + ":" + this.context.user.password)
-      }
-    })
-      .then(status)
-      .then(json)
-      .then(dataFromServer => {
-        this.setState({
-          success: true,
-        });
-        window.scrollTo(0, 0);
-        // After 2 seconds remove success message
-        setTimeout(() => {
-          this.setState({
-            success: false,
-          });
-        }, 2000);
-        console.log(dataFromServer);
-      })
-      .catch(error => {
-        window.scrollTo(0, 0);
-        this.setState({
-          errorMessage: `${JSON.stringify(error.errorMessage)}`,
-          error: true
-        });
-      });
-  }
+  // /**
+  // * Deletes an property!
+  // */
+  // deleteProperty() {
+  //   fetch(`https://maximum-arena-3000.codio-box.uk/api/properties/${this.props.prop_ID}`, {
+  //     method: "DELETE",
+  //     body: null,
+  //     headers: {
+  //       "Authorization": "Basic " + btoa(this.context.user.username + ":" + this.context.user.password)
+  //     }
+  //   })
+  //     .then(status)
+  //     .then(json)
+  //     .then(dataFromServer => {
+  //       this.setState({
+  //         success: true,
+  //       });
+  //       window.scrollTo(0, 0);
+  //       // After 2 seconds remove success message
+  //       setTimeout(() => {
+  //         this.setState({
+  //           success: false,
+  //         });
+  //       }, 2000);
+  //       console.log(dataFromServer);
+  //     })
+  //     .catch(error => {
+  //       window.scrollTo(0, 0);
+  //       this.setState({
+  //         errorMessage: `${JSON.stringify(error.errorMessage)}`,
+  //         error: true
+  //       });
+  //     });
+  // }
 
   render() {
 
@@ -120,44 +117,19 @@ class PropertyCard extends React.Component {
           <MessageOutlined key="messages" style={{ color: 'steelblue' }} onClick={() => (history.push("/addProperty"))} />,
           <EditOutlined key="edit" style={{ color: 'steelblue' }} />,
           <ExclamationCircleOutlined key="markHighPriority" onClick={() => (this.toggleHighPriority())} style={{ color: this.state.highPriority ? 'red' : 'steelblue' }} />,
-          <DeleteOutlined key="delete" onClick={() => (this.deleteProperty())} style={{ color: 'steelblue' }} />
+          <DeleteOutlined key="delete" onClick={() => (this.props.deleteProperty(this.props.prop_ID))} style={{ color: 'steelblue' }} />
         ];
     } else {
       cardActions =
         [
-          <MessageOutlined key="messages" style={{ color: 'steelblue' }} onClick={() => (history.push("/addProperty"))} />
+          <MessageOutlined key="messages" style={{ color: 'steelblue' }} onClick={() => (this.props.es6Function(1))} />
         ];
     }
 
-    /**
-    * Error Alert from ant design.
-    */
-    const errorMessage = (
-      <Alert
-        message="Error"
-        description={this.state.errorMessage}
-        type="error"
-        showIcon
-      />
-    );
-
-    /**
-    * Success Alert from ant design.
-    */
-    const successMessage = (
-      <Alert
-        message="Property deleted successfully!"
-        description=""
-        type="success"
-        showIcon
-      />
-    );
+    
 
     return (
       <>
-        {this.state.error ? <div>{errorMessage}</div> : ''} {/* Show error message when needed*/}
-        {this.state.success ? <div>{successMessage}</div> : ''}  {/* Show success message needed*/}
-
         <Card
           style={{ width: 400 }}
           // cover={<NavImage alt={`Post ${postID}`} src={this.props.imageURL} to={`/post/${postID}`} />}
