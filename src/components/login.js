@@ -121,7 +121,7 @@ class LoginForm extends React.Component {
 					<Form.Item name="username" label="Username" rules={usernameRules}>
 						<Input />
 					</Form.Item>
-					<Form.Item name="password" label="Password" rules={passwordRules} hasFeedback>
+					<Form.Item name="password" label="Password" rules={passwordRules} >
 						<Input.Password />
 					</Form.Item>
 					<Form.Item {...tailFormItemLayout}>
