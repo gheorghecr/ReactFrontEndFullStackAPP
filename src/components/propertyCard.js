@@ -1,9 +1,8 @@
 import React from 'react';
-import { withRouter } from 'react-router-dom';
 import { status, json } from '../utilities/requestHandlers';
 import UserContext from '../contexts/user';
-import { Card, Carousel} from 'antd';
-import { EditOutlined, MessageOutlined, DeleteOutlined, ExclamationCircleOutlined, ExclamationCircleFilled } from '@ant-design/icons';
+import { Card, Carousel } from 'antd';
+import { EditOutlined, MessageOutlined, DeleteOutlined, ExclamationCircleOutlined, EyeOutlined } from '@ant-design/icons';
 
 const { Meta } = Card;
 
@@ -13,20 +12,21 @@ class PropertyCard extends React.Component {
     super(props);
     this.state = {
       highPriority: this.props.highPriority,
+      visibility: this.props.visibility,
     };
     this.toggleHighPriority = this.toggleHighPriority.bind(this);
-    // this.deleteProperty = this.deleteProperty.bind(this);
+    this.toggleHighVisibility = this.toggleHighVisibility.bind(this);
   }
 
   static contextType = UserContext;
 
-  componentDidMount() {
-
-  }
-
+   componentDidMount() {
+     
+   } 
   /**
-  * Toggles the high priority attribute for a property
-  */
+   * Function that toggles the High Priority attribute for a property
+   */
+  // TODO: method to pop up success an error message
   toggleHighPriority() {
     fetch(`https://maximum-arena-3000.codio-box.uk/api/properties/togglehighpriority/${this.props.prop_ID}`, {
       method: "GET",
@@ -40,61 +40,40 @@ class PropertyCard extends React.Component {
       .then(dataFromServer => {
         this.setState({
           highPriority: !this.state.highPriority,
-          success: true,
         });
-        window.scrollTo(0, 0);
-
-        // After 2 seconds remove success message
-        setTimeout(() => {
-          this.setState({
-            success: false,
-          });
-        }, 2000);
+        this.props.successMessage('High Priority Toggled successfully!', ' ');
         console.log(dataFromServer);
       })
       .catch(error => {
-        window.scrollTo(0, 0);
-        this.setState({
-          errorMessage: `${JSON.stringify(error.errorMessage)}`,
-          error: true
-        });
+        this.props.errorMessage('Error Occurred', 'Could not toggle high priority attribute. Try Again!');
       });
   }
 
-  // /**
-  // * Deletes an property!
-  // */
-  // deleteProperty() {
-  //   fetch(`https://maximum-arena-3000.codio-box.uk/api/properties/${this.props.prop_ID}`, {
-  //     method: "DELETE",
-  //     body: null,
-  //     headers: {
-  //       "Authorization": "Basic " + btoa(this.context.user.username + ":" + this.context.user.password)
-  //     }
-  //   })
-  //     .then(status)
-  //     .then(json)
-  //     .then(dataFromServer => {
-  //       this.setState({
-  //         success: true,
-  //       });
-  //       window.scrollTo(0, 0);
-  //       // After 2 seconds remove success message
-  //       setTimeout(() => {
-  //         this.setState({
-  //           success: false,
-  //         });
-  //       }, 2000);
-  //       console.log(dataFromServer);
-  //     })
-  //     .catch(error => {
-  //       window.scrollTo(0, 0);
-  //       this.setState({
-  //         errorMessage: `${JSON.stringify(error.errorMessage)}`,
-  //         error: true
-  //       });
-  //     });
-  // }
+  /**
+  * Toggles the high priority attribute for a property
+  */
+  // TODO: method to pop up success an error message
+  toggleHighVisibility() {
+    fetch(`https://maximum-arena-3000.codio-box.uk/api/properties/togglevisibility/${this.props.prop_ID}`, {
+      method: "GET",
+      body: null,
+      headers: {
+        "Authorization": "Basic " + btoa(this.context.user.username + ":" + this.context.user.password)
+      }
+    })
+      .then(status)
+      .then(json)
+      .then(dataFromServer => {
+        this.setState({
+          visibility: !this.state.visibility,
+        });
+        this.props.successMessage('Visibility Toggled successfully!', ' ');
+        console.log(dataFromServer);
+      })
+      .catch(error => {
+        this.props.errorMessage('Error Occurred', 'Could not toggle visibility attribute. Try Again!');
+      });
+  }
 
   render() {
 
@@ -117,6 +96,7 @@ class PropertyCard extends React.Component {
           <MessageOutlined key="messages" style={{ color: 'steelblue' }} onClick={() => (history.push("/addProperty"))} />,
           <EditOutlined key="edit" style={{ color: 'steelblue' }} />,
           <ExclamationCircleOutlined key="markHighPriority" onClick={() => (this.toggleHighPriority())} style={{ color: this.state.highPriority ? 'red' : 'steelblue' }} />,
+          <EyeOutlined key="markHighPriority" onClick={() => (this.toggleHighVisibility())} style={{ color: this.state.visibility ? 'green' : 'red' }} />,
           <DeleteOutlined key="delete" onClick={() => (this.props.deleteProperty(this.props.prop_ID))} style={{ color: 'steelblue' }} />
         ];
     } else {
@@ -125,8 +105,6 @@ class PropertyCard extends React.Component {
           <MessageOutlined key="messages" style={{ color: 'steelblue' }} onClick={() => (this.props.es6Function(1))} />
         ];
     }
-
-    
 
     return (
       <>

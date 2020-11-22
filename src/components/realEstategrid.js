@@ -12,8 +12,11 @@ class RealEstateGrid extends React.Component {
       posts: [],
       loading: true,
       success: false, // state to check when to show the alert
+      successMessage: '', // success alert message
+      successDescription: '', 
       error: false, // state to check when to show the alert
       errorMessage: ' ', // error alert message
+      errorDescription: '',
     }
   }
 
@@ -63,17 +66,59 @@ class RealEstateGrid extends React.Component {
     });
   }
 
+ /**
+ * Method to popUP a error message with a custom message.
+ *
+ * @param {string} title Title for the error message.
+ * @param {string} description Description for the error message.
+ */
+ errorMessage = (title, description) => {
+  this.setState({
+    error: true,
+    errorMessage: title,
+    errorDescription: description,
+  });
+}
+
+/**
+ * Method to popUP a error message with a custom message.
+ *
+ * @param {string} title Title for the error message.
+ * @param {string} description Description for the error message.
+ */
+successMessage = (title, description) => {
+  this.setState({
+    success: true,
+    successMessage: title,
+    successDescription: description,
+  });
+}
+
   /**
   * Fetch all the properties
   */
   componentDidMount() {
-    // TODO: Different link for admin an normal user
-    fetch('https://maximum-arena-3000.codio-box.uk/api/properties')
+    let fetchLink;
+    // Fetch request depends on the user role
+    if(this.context.user.role === 'admin') {
+      fetchLink = 'https://maximum-arena-3000.codio-box.uk/api/properties/adminview';
+    } else {
+      fetchLink = 'https://maximum-arena-3000.codio-box.uk/api/properties';
+    }
+
+    fetch(fetchLink, {
+      method: "GET",
+      body: null,
+      headers: {
+        "Authorization": "Basic " + btoa(this.context.user.username + ":" + this.context.user.password)
+      }
+    })
       .then(status)
       .then(json)
       .then(data => {
         this.setState({ posts: data })
         this.setState({ loading: false })
+        console.log(data)
       })
       .catch(err => console.log("Error fetching properties", err));
   }
@@ -85,8 +130,8 @@ class RealEstateGrid extends React.Component {
     */
     const errorMessage = (
       <Alert
-        message="Error"
-        description={this.state.errorMessage}
+        message={this.state.errorMessage}
+        description={this.state.errorDescription}
         type="error"
         showIcon
       />
@@ -97,8 +142,8 @@ class RealEstateGrid extends React.Component {
     */
     const successMessage = (
       <Alert
-        message="Property deleted successfully!"
-        description=""
+        message = {this.state.successMessage}
+        description= {this.state.successDescription}
         type="success"
         showIcon
       />
@@ -130,7 +175,7 @@ class RealEstateGrid extends React.Component {
       return (
         <div style={{ padding: "10px" }} key={post.prop_ID}>
           <Col span={6}>
-            <PropertyCard {...post} history={this.props.history} deleteProperty={this.deleteProperty} />
+            <PropertyCard {...post} history={this.props.history} deleteProperty={this.deleteProperty} successMessage={this.successMessage} errorMessage={this.errorMessage}/>
           </Col>
         </div>
       )
