@@ -93,11 +93,34 @@ class PropertyCard extends React.Component {
     if (this.context.user.role === 'admin') {
       cardActions =
         [
-          <MessageOutlined key="messages" style={{ color: 'steelblue' }} onClick={() => (history.push("/addProperty"))} />,
-          <EditOutlined key="edit" style={{ color: 'steelblue' }} />,
-          <ExclamationCircleOutlined key="markHighPriority" onClick={() => (this.toggleHighPriority())} style={{ color: this.state.highPriority ? 'red' : 'steelblue' }} />,
-          <EyeOutlined key="markHighPriority" onClick={() => (this.toggleHighVisibility())} style={{ color: this.state.visibility ? 'green' : 'red' }} />,
-          <DeleteOutlined key="delete" onClick={() => (this.props.deleteProperty(this.props.prop_ID))} style={{ color: 'steelblue' }} />
+          <MessageOutlined 
+            key="messages" 
+            style={{ color: 'steelblue' }} 
+            onClick={() => (history.push("/editProperty"))} 
+          />,
+          <EditOutlined 
+            key="edit" 
+            style={{ color: 'steelblue' }} 
+            onClick={() => (history.push({
+              pathname: '/editProperty',
+              state: {prop_ID: this.props.prop_ID}
+            }))} 
+          />,
+          <ExclamationCircleOutlined 
+            key="markHighPriority" 
+            onClick={() => (this.toggleHighPriority())} 
+            style={{ color: this.state.highPriority ? 'red' : 'steelblue' }} 
+          />,
+          <EyeOutlined 
+            key="markHighPriority" 
+            onClick={() => (this.toggleHighVisibility())} 
+            style={{ color: this.state.visibility ? 'green' : 'red' }} 
+          />,
+          <DeleteOutlined 
+            key="delete" 
+            onClick={() => (this.props.deleteProperty(this.props.prop_ID))} 
+            style={{ color: 'steelblue' }} 
+          />
         ];
     } else {
       cardActions =
