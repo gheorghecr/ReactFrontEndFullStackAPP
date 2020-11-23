@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
 import UserContext from '../contexts/user';
-
-import { Form, Input, Button, Upload, Alert, Select, InputNumber, Carousel, Image } from 'antd';
+import React from 'react';
+import { Form, Input, Button, Upload, Alert, Select, InputNumber, Row, Image, } from 'antd';
 import { status, json } from '../utilities/requestHandlers';
-import { UploadOutlined } from '@ant-design/icons';
+import { UploadOutlined, DeleteOutlined } from '@ant-design/icons';
 import { withRouter } from 'react-router-dom';
 
 const { TextArea } = Input;
@@ -52,6 +51,8 @@ class EditProperty extends React.Component {
     this.onFinish = this.onFinish.bind(this);
     this.onFinishFailed = this.onFinishFailed.bind(this);
     this.onChange = this.onChange.bind(this);
+    this.deleteImage = this.deleteImage.bind(this);
+    this.deleteImageFromImagesObject = this.deleteImageFromImagesObject.bind(this);
   }
 
   static contextType = UserContext;
@@ -100,11 +101,49 @@ class EditProperty extends React.Component {
         });
       })
       .catch(error => {
-        setTimeout(() => {
-          this.getImagesName(); // keep requesting for this images names
-        }, 2000);
+        // TODO: post error message
       });
   }
+
+  /**
+  * This will retrieve the image names from the server. And store it.
+  */
+ deleteImage(imageID) {
+  fetch(`https://maximum-arena-3000.codio-box.uk/api/images/${imageID}`, {
+    method: "DELETE",
+    body: null,
+    headers: {
+      "Authorization": "Basic " + btoa(this.context.user.username + ":" + this.context.user.password)
+    }
+  })
+    .then(status)
+    .then(json)
+    .then(dataFromServer => {
+      console.log(dataFromServer, 'images delete function')
+      this.deleteImageFromImagesObject(imageID);
+    })
+    .catch(error => {
+      this.setState({
+        errorMessage: `Error deleting image! Please try again!`,
+        error: true
+      });
+    });
+}
+
+/**
+  * Deletes the deleted image from the images list on the state
+  * And Triggers update
+  * 
+  * @param {integer} imageID ImageID to be deleted from the local state.
+  */
+ deleteImageFromImagesObject = (imageID) => {
+  const imagesObjectCopy = [...this.state.propertyImagesName];
+  const indexToRemove = imagesObjectCopy.findIndex(obj => obj.imageID === imageID);
+  imagesObjectCopy.splice(indexToRemove, 1);
+  this.setState({
+    propertyImagesName: imagesObjectCopy,
+  });
+}
 
   /**
   * When user clicks on registering. Post data to the server.
@@ -176,8 +215,6 @@ class EditProperty extends React.Component {
   }
 
   render() {
-    // const { loading } = this.state
-
     /**
     * Error Alert from ant design.
     */
@@ -210,29 +247,38 @@ class EditProperty extends React.Component {
     // Show loading post while loading the data from the server
     if (!this.state.propertyObject) {
       return (
-        <h1>test</h1>
+        <h1 align="middle" style={{ padding: '2% 20%' }}>Getting data from server ...</h1>
       )
     }
 
-    // Used on the image carousel 
-    const contentStyle = {
-      height: '400px',
-      color: '#fff',
-      lineHeight: '160px',
-      textAlign: 'center',
-      background: '#364d79',
-    };
+    let propertyImagesHeader;
+
+    if (this.state.propertyImagesName) {
+      propertyImagesHeader = <h1 align="middle" style={{ padding: '2% 20%' }}>Edit Current Images</h1>
+    } else {
+      propertyImagesHeader = <h1 align="middle" style={{ padding: '2% 20%' }}>There are no images for this property</h1>
+    }
 
     let photoList = [];
 
+    // map all available images only if they exist
     if (this.state.propertyImagesName) {
       photoList = this.state.propertyImagesName.map(image => {
         return (
           <div>
-            <Image
-              width={200}
-              src={`https://maximum-arena-3000.codio-box.uk/${image.imageName}`}
-            />
+            <div>
+              <Image
+                width={200}
+                src={`https://maximum-arena-3000.codio-box.uk/${image.imageName}`}
+              />
+            </div>
+            <div align='center'>
+              <DeleteOutlined
+                key='delete'
+                onClick={() => (this.deleteImage(image.imageID))}
+                style={{ color: 'red', fontSize: '25px', padding: '2% 20%' }}
+              />
+            </div>
           </div>
         )
       });
@@ -246,12 +292,6 @@ class EditProperty extends React.Component {
         {this.state.error ? <div>{errorMessage}</div> : ''} {/* Show error message when property NOT added  successfully*/}
 
         <h1 align="middle" style={{ padding: '2% 20%' }}>Edit property</h1>
-        <Carousel autoplay dotPosition={'top'} style={{ padding: '2% 20%' }}>
-          {photoList}
-          {/* <div>
-            <h3 style={contentStyle}>4</h3>
-          </div> */}
-        </Carousel>
         <Form {...formItemLayout} name="register" onFinish={this.onFinish} scrollToFirstError onFinishFailed={this.onFinishFailed} >
           <Form.Item name="title" label="Title" rules={titleRules} required tooltip="This is a required field" initialValue={this.state.propertyObject.title}>
             <Input />
@@ -284,7 +324,7 @@ class EditProperty extends React.Component {
               <Option value="Sold">Sold</Option>
             </Select>
           </Form.Item>
-          <Form.Item name="file" label="Select your avatar" >
+          <Form.Item name="file" label="Select property images:" >
             <Upload {...photosActions}>
               <Button icon={<UploadOutlined />}>Upload</Button>
             </Upload>
@@ -295,6 +335,11 @@ class EditProperty extends React.Component {
 					</Button>
           </Form.Item>
         </Form>
+        {propertyImagesHeader}
+        <Row type="flex" justify="space-around">
+          {photoList}
+        </Row>
+
       </>
     );
   }
