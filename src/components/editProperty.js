@@ -101,54 +101,60 @@ class EditProperty extends React.Component {
         });
       })
       .catch(error => {
-        // TODO: post error message
+        
       });
   }
 
   /**
   * This will retrieve the image names from the server. And store it.
   */
- deleteImage(imageID) {
-  fetch(`https://maximum-arena-3000.codio-box.uk/api/images/${imageID}`, {
-    method: "DELETE",
-    body: null,
-    headers: {
-      "Authorization": "Basic " + btoa(this.context.user.username + ":" + this.context.user.password)
-    }
-  })
-    .then(status)
-    .then(json)
-    .then(dataFromServer => {
-      console.log(dataFromServer, 'images delete function')
-      this.deleteImageFromImagesObject(imageID);
+  deleteImage(imageID) {
+    fetch(`https://maximum-arena-3000.codio-box.uk/api/images/${imageID}`, {
+      method: "DELETE",
+      body: null,
+      headers: {
+        "Authorization": "Basic " + btoa(this.context.user.username + ":" + this.context.user.password)
+      }
     })
-    .catch(error => {
-      this.setState({
-        errorMessage: `Error deleting image! Please try again!`,
-        error: true
+      .then(status)
+      .then(json)
+      .then(dataFromServer => {
+        console.log(dataFromServer, 'images delete function')
+        this.deleteImageFromImagesObject(imageID);
+      })
+      .catch(error => {
+        this.setState({
+          errorMessage: `Error deleting image! Please try again!`,
+          error: true
+        });
       });
-    });
-}
+  }
 
-/**
-  * Deletes the deleted image from the images list on the state
-  * And Triggers update
-  * 
-  * @param {integer} imageID ImageID to be deleted from the local state.
-  */
- deleteImageFromImagesObject = (imageID) => {
-  const imagesObjectCopy = [...this.state.propertyImagesName];
-  const indexToRemove = imagesObjectCopy.findIndex(obj => obj.imageID === imageID);
-  imagesObjectCopy.splice(indexToRemove, 1);
-  this.setState({
-    propertyImagesName: imagesObjectCopy,
-  });
-}
+  /**
+    * Deletes the deleted image from the images list on the state
+    * And Triggers update
+    * 
+    * @param {integer} imageID ImageID to be deleted from the local state.
+    */
+  deleteImageFromImagesObject = (imageID) => {
+    const imagesObjectCopy = [...this.state.propertyImagesName];
+    const indexToRemove = imagesObjectCopy.findIndex(obj => obj.imageID === imageID);
+    imagesObjectCopy.splice(indexToRemove, 1);
+    this.setState({
+      propertyImagesName: imagesObjectCopy,
+    });
+  }
 
   /**
   * When user clicks on registering. Post data to the server.
   */
   onFinish = (values) => {
+    // remove error or success popUP message if there are any
+    this.setState({
+      error: false,
+      success: false,
+    })
+
     console.log('Received values of add property form: ', values);
     const { confirm, ...data } = values;  // ignore the 'confirm' value in data sent
 
@@ -164,9 +170,9 @@ class EditProperty extends React.Component {
     for (let file of this.state.fileList) {
       formData.append('file', file.originFileObj)
     }
-
-    fetch('https://maximum-arena-3000.codio-box.uk/api/properties', {
-      method: "POST",
+    console.log(formData);
+    fetch(`https://maximum-arena-3000.codio-box.uk/api/properties/${this.state.prop_ID}`, {
+      method: "PUT",
       body: formData,
       headers: {
         "Authorization": "Basic " + btoa(this.context.user.username + ":" + this.context.user.password)
@@ -176,14 +182,15 @@ class EditProperty extends React.Component {
       .then(json)
       .then(dataFromServer => {
         this.setState({
-          success: true
+          success: true,
+          successMessage: 'Property updated successfully! Page will refresh automatically ...'
         });
         console.log(dataFromServer);
         window.scrollTo(0, 0);
         setTimeout(() => {
-          this.props.history.push('/')
-        }, 2000);
-
+					this.componentWillMount()
+				}, 1000);
+        
       })
       .catch(error => {
         window.scrollTo(0, 0);
@@ -284,7 +291,6 @@ class EditProperty extends React.Component {
       });
     }
 
-
     return (
       <>
 
@@ -318,7 +324,7 @@ class EditProperty extends React.Component {
             </Select>
           </Form.Item>
           <Form.Item name="status" label="Status" tooltip="Status of the property?">
-            <Select style={{ width: '20%' }} defaultValue={this.state.propertyObject.status ? 'Yes' : 'No'} >
+            <Select style={{ width: '20%' }} defaultValue={this.state.propertyObject.status ? 'Under Offer' : 'Sold'} >
               <Option value="For Sale">For Sale</Option>
               <Option value="Under Offer">Under Offer</Option>
               <Option value="Sold">Sold</Option>
