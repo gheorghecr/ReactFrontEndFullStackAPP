@@ -160,6 +160,24 @@ class EditProperty extends React.Component {
 
     delete data.file; //I don't use the file from here
 
+    // Use the data that came from the server if the user does not select nothing.
+    // Because if this is not selected again, app will send them as undefined
+    if(typeof data.highPriority === 'undefined') {
+      data.highPriority = this.state.propertyObject.highPriority
+    }
+
+    // Use the data that came from the server if the user does not select nothing.
+    // Because if this is not selected again, app will send them as undefined
+    if(typeof data.visibility === 'undefined') {
+      data.visibility = this.state.propertyObject.visibility
+    }
+
+    // Use the data that came from the server if the user does not select nothing.
+    // Because if this is not selected again, app will send them as undefined
+    if(typeof data.status === 'undefined') {
+      data.status = this.state.propertyObject.status
+    }
+
     const formData = new FormData();
 
     for (const [key, value] of Object.entries(data)) {
@@ -170,7 +188,7 @@ class EditProperty extends React.Component {
     for (let file of this.state.fileList) {
       formData.append('file', file.originFileObj)
     }
-    console.log(formData);
+    
     fetch(`https://maximum-arena-3000.codio-box.uk/api/properties/${this.state.prop_ID}`, {
       method: "PUT",
       body: formData,
