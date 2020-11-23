@@ -194,7 +194,7 @@ class AddPropertyForm extends React.Component {
 							<Option value="Sold">Sold</Option>
 						</Select>
 					</Form.Item>
-					<Form.Item name="file" label="Select your avatar" >
+					<Form.Item name="file" label="Select property images:" >
 						<Upload {...photosActions}>
 							<Button icon={<UploadOutlined />}>Upload</Button>
 						</Upload>
