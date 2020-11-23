@@ -116,6 +116,7 @@ class RealEstateGrid extends React.Component {
       .then(status)
       .then(json)
       .then(data => {
+        console.log(data)
         this.setState({ posts: data })
         this.setState({ loading: false })
       })
