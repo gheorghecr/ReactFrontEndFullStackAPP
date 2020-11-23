@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import UserContext from '../contexts/user';
 
-import { Form, Input, Button, Upload, Alert, Select, InputNumber } from 'antd';
+import { Form, Input, Button, Upload, Alert, Select, InputNumber, Carousel, Image } from 'antd';
 import { status, json } from '../utilities/requestHandlers';
 import { UploadOutlined } from '@ant-design/icons';
 import { withRouter } from 'react-router-dom';
@@ -71,10 +71,37 @@ class EditProperty extends React.Component {
         this.setState({
           propertyObject: dataFromServer[0]
         });
+        this.getImagesName();
       })
       .catch(error => {
         setTimeout(() => {
           this.componentDidMount(); // keep requesting for this property
+        }, 2000);
+      });
+  }
+
+  /**
+  * This will retrieve the image names from the server. And store it.
+  */
+  getImagesName() {
+    fetch(`https://maximum-arena-3000.codio-box.uk/api/images/${this.state.prop_ID}`, {
+      method: "GET",
+      body: null,
+      headers: {
+        "Authorization": "Basic " + btoa(this.context.user.username + ":" + this.context.user.password)
+      }
+    })
+      .then(status)
+      .then(json)
+      .then(dataFromServer => {
+        console.log(dataFromServer, 'images')
+        this.setState({
+          propertyImagesName: dataFromServer
+        });
+      })
+      .catch(error => {
+        setTimeout(() => {
+          this.getImagesName(); // keep requesting for this images names
         }, 2000);
       });
   }
@@ -149,7 +176,7 @@ class EditProperty extends React.Component {
   }
 
   render() {
-    const { loading } = this.state;
+    // const { loading } = this.state
 
     /**
     * Error Alert from ant design.
@@ -180,32 +207,60 @@ class EditProperty extends React.Component {
       beforeUpload: () => false // upload manually
     };
 
-    // // Show loading post while loading the data from the server
-    console.log(this.state.propertyObject, 'porrrrr')
+    // Show loading post while loading the data from the server
     if (!this.state.propertyObject) {
       return (
         <h1>test</h1>
       )
     }
 
-    console.log('render')
-    console.log(this.state.propertyObject, 'render aqui')
+    // Used on the image carousel 
+    const contentStyle = {
+      height: '400px',
+      color: '#fff',
+      lineHeight: '160px',
+      textAlign: 'center',
+      background: '#364d79',
+    };
+
+    let photoList = [];
+
+    if (this.state.propertyImagesName) {
+      photoList = this.state.propertyImagesName.map(image => {
+        return (
+          <div>
+            <Image
+              width={200}
+              src={`https://maximum-arena-3000.codio-box.uk/${image.imageName}`}
+            />
+          </div>
+        )
+      });
+    }
+
+
     return (
       <>
-      
+
         {this.state.success ? <div>{successMessage}</div> : ''}  {/* Show success message when property added successfully*/}
         {this.state.error ? <div>{errorMessage}</div> : ''} {/* Show error message when property NOT added  successfully*/}
 
         <h1 align="middle" style={{ padding: '2% 20%' }}>Edit property</h1>
+        <Carousel autoplay dotPosition={'top'} style={{ padding: '2% 20%' }}>
+          {photoList}
+          {/* <div>
+            <h3 style={contentStyle}>4</h3>
+          </div> */}
+        </Carousel>
         <Form {...formItemLayout} name="register" onFinish={this.onFinish} scrollToFirstError onFinishFailed={this.onFinishFailed} >
           <Form.Item name="title" label="Title" rules={titleRules} required tooltip="This is a required field" initialValue={this.state.propertyObject.title}>
             <Input />
           </Form.Item>
           <Form.Item name="description" label="Description" rules={descriptionRules} required tooltip="This is a required field" initialValue={this.state.propertyObject.description}>
-            <TextArea rows={6}/>
+            <TextArea rows={6} />
           </Form.Item>
           <Form.Item name="location" label="Location" rules={locationRules} required tooltip="This is a required field" initialValue={this.state.propertyObject.location}>
-            <TextArea rows={3}>LOL</TextArea> 
+            <TextArea rows={3}>LOL</TextArea>
           </Form.Item>
           <Form.Item name="price" label="Price" rules={priceRules} required tooltip="This is a required field" initialValue={this.state.propertyObject.price}>
             <InputNumber min={1} max={100000000000000} style={{ width: '20%' }} />
