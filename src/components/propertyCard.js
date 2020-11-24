@@ -1,7 +1,7 @@
 import React from 'react';
 import { status, json } from '../utilities/requestHandlers';
 import UserContext from '../contexts/user';
-import { Card, Carousel } from 'antd';
+import { Card, Carousel, Image } from 'antd';
 import { EditOutlined, MessageOutlined, DeleteOutlined, ExclamationCircleOutlined, EyeOutlined } from '@ant-design/icons';
 
 const { Meta } = Card;
@@ -11,6 +11,7 @@ class PropertyCard extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      prop_ID: this.props.prop_ID,
       highPriority: this.props.highPriority,
       visibility: this.props.visibility,
     };
@@ -19,14 +20,34 @@ class PropertyCard extends React.Component {
   }
 
   static contextType = UserContext;
-
+  
+  /**
+  * This will retrieve the image names from the server. And store it.
+  */
    componentDidMount() {
-     
+    fetch(`https://maximum-arena-3000.codio-box.uk/api/images/${this.state.prop_ID}`, {
+      method: "GET",
+      body: null,
+      headers: {
+        "Authorization": "Basic " + btoa(this.context.user.username + ":" + this.context.user.password)
+      }
+    })
+      .then(status)
+      .then(json)
+      .then(dataFromServer => {
+        console.log(dataFromServer, 'images')
+        this.setState({
+          propertyImagesName: dataFromServer
+        });
+      })
+      .catch(error => {
+        
+      });
    } 
+
   /**
    * Function that toggles the High Priority attribute for a property
    */
-  // TODO: method to pop up success an error message
   toggleHighPriority() {
     fetch(`https://maximum-arena-3000.codio-box.uk/api/properties/togglehighpriority/${this.props.prop_ID}`, {
       method: "GET",
@@ -52,7 +73,6 @@ class PropertyCard extends React.Component {
   /**
   * Toggles the high priority attribute for a property
   */
-  // TODO: method to pop up success an error message
   toggleHighVisibility() {
     fetch(`https://maximum-arena-3000.codio-box.uk/api/properties/togglevisibility/${this.props.prop_ID}`, {
       method: "GET",
@@ -129,6 +149,24 @@ class PropertyCard extends React.Component {
         ];
     }
 
+    let photoList = [];
+
+    // map all available images only if they exist
+    if (this.state.propertyImagesName) {
+      photoList = this.state.propertyImagesName.map(image => {
+        return (
+          <div>
+            <div>
+              <Image
+                width={200}
+                src={`https://maximum-arena-3000.codio-box.uk/${image.imageName}`}
+              />
+            </div>
+          </div>
+        )
+      });
+    }
+
     return (
       <>
         <Card
@@ -138,19 +176,8 @@ class PropertyCard extends React.Component {
           hoverable={true}
           loading={this.props.loading}
           actions={cardActions}>
-          <Carousel autoplay>
-            <div>
-              <h3 style={contentStyle}>1</h3>
-            </div>
-            <div>
-              <h3 style={contentStyle}>2</h3>
-            </div>
-            <div>
-              <h3 style={contentStyle}>3</h3>
-            </div>
-            <div>
-              <h3 style={contentStyle}>4</h3>
-            </div>
+          <Carousel autoplay dotPosition={'top'}>
+            {photoList}
           </Carousel>
           <Meta
             title={this.props.title}
