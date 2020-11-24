@@ -8,6 +8,7 @@ import Login from './components/login';
 import Home from './components/home';
 import AddPropertyForm from './components/addProperty';
 import EditProperty from './components/editProperty';
+import ViewPropertyDetails from './components/propertyDetailsView';
 
 import UserContext from './contexts/user';
 
@@ -63,9 +64,7 @@ class App extends React.Component {
                 <Route path="/login" children={<Login />} />
                 <Route path="/addProperty" children={<AddPropertyForm />} />
                 <Route path="/editProperty" children={<EditProperty />} />
-                {/* <Route path="/post/:id" children={<Post />} />
-                
-                */}
+                <Route path="/propertyDetails" children={<ViewPropertyDetails />} />
               </Switch>
             </Content>
 
