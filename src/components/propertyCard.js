@@ -96,15 +96,6 @@ class PropertyCard extends React.Component {
   }
 
   render() {
-
-    const contentStyle = {
-      height: '160px',
-      color: '#fff',
-      lineHeight: '160px',
-      textAlign: 'center',
-      background: '#364d79',
-    };
-
     let cardActions;
     // Render different card actions depending if who is logged in is normal user 
     // or an admin.
@@ -116,7 +107,7 @@ class PropertyCard extends React.Component {
           <MessageOutlined 
             key="messages" 
             style={{ color: 'steelblue' }} 
-            onClick={() => (history.push("/editProperty"))} 
+            onClick={() => (alert('Message Admin'))} 
           />,
           <EditOutlined 
             key="edit" 
@@ -145,7 +136,7 @@ class PropertyCard extends React.Component {
     } else {
       cardActions =
         [
-          <MessageOutlined key="messages" style={{ color: 'steelblue' }} onClick={() => (this.props.es6Function(1))} />
+          <MessageOutlined key="messages" style={{ color: 'steelblue' }} onClick={() => (alert('messageGoing'))} />
         ];
     }
 
@@ -171,8 +162,10 @@ class PropertyCard extends React.Component {
       <>
         <Card
           style={{ width: 400 }}
-          // cover={<NavImage alt={`Post ${postID}`} src={this.props.imageURL} to={`/post/${postID}`} />}
-
+          onClick={() => (history.push({
+            pathname: '/propertyDetails',
+            state: {prop_ID: this.props.prop_ID}
+          }))}
           hoverable={true}
           loading={this.props.loading}
           actions={cardActions}>
