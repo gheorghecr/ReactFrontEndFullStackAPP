@@ -106,7 +106,7 @@ class EditProperty extends React.Component {
         </Carousel>
         <div align="center" style = {{  marginBottom : 40}}>
           <Button type="primary" shape="round" size='large'  align="center" >
-            Send a message about this property.
+            Send a message about this property
           </Button>
         </div>
         <Form {...formItemLayout}>
