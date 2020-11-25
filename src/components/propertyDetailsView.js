@@ -3,7 +3,6 @@ import React from 'react';
 import { Form, Carousel, Image, Button } from 'antd';
 import { status, json } from '../utilities/requestHandlers';
 import { withRouter } from 'react-router-dom';
-import { MessageOutlined, EditOutlined, DeleteOutlined, ExclamationCircleOutlined, EyeOutlined  } from '@ant-design/icons';
 
 const formItemLayout = {
   labelCol: { xs: { span: 24 }, sm: { span: 6 } },
@@ -104,7 +103,7 @@ class EditProperty extends React.Component {
         <Carousel autoplay dotPosition={'top'} style={{ padding: '2% 20%' }}>
           {photoList}
         </Carousel>
-        <div align="center" style = {{  marginBottom : 40}}>
+        <div align="center" style={{marginBottom : 40}}>
           <Button type="primary" shape="round" size='large'  align="center" >
             Send a message about this property
           </Button>
