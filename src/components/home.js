@@ -1,14 +1,12 @@
 import React from 'react';
 import { PageHeader, Input } from 'antd';
 import RealEstateGrid from './realEstategrid';
-import Messages from './messages';
 
 const { Search } = Input;
 
 function Home(props) {
   return (
     <>
-      <Messages/>
       <div className="site-layout-content">
         <div style={{ padding: '2% 20%' }}>
           <Search placeholder="input search text"
