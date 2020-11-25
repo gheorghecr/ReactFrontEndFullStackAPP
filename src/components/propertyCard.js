@@ -139,12 +139,6 @@ class PropertyCard extends React.Component {
     } else {
       cardActions =
         [
-          <MessageOutlined key="messages" 
-          style={{ color: 'steelblue' }} 
-          onClick={() => (history.push({
-            pathname: '/messages',
-            state: {prop_ID: this.props.prop_ID}
-          }))} />
         ];
     }
 
