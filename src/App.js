@@ -9,6 +9,7 @@ import Home from './components/home';
 import AddPropertyForm from './components/addProperty';
 import EditProperty from './components/editProperty';
 import ViewPropertyDetails from './components/propertyDetailsView';
+import Messages from './components/messages';
 
 import UserContext from './contexts/user';
 
@@ -65,6 +66,7 @@ class App extends React.Component {
                 <Route path="/addProperty" children={<AddPropertyForm />} />
                 <Route path="/editProperty" children={<EditProperty />} />
                 <Route path="/propertyDetails" children={<ViewPropertyDetails />} />
+                <Route path="/messages" children={<Messages />} />
               </Switch>
             </Content>
 
