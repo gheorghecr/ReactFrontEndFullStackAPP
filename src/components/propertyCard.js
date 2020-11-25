@@ -1,7 +1,7 @@
 import React from 'react';
 import { status, json } from '../utilities/requestHandlers';
 import UserContext from '../contexts/user';
-import { Card, Carousel, Image } from 'antd';
+import { Card, Carousel, Image, Button } from 'antd';
 import { EditOutlined, MessageOutlined, DeleteOutlined, ExclamationCircleOutlined, EyeOutlined } from '@ant-design/icons';
 
 const { Meta } = Card;
@@ -107,7 +107,10 @@ class PropertyCard extends React.Component {
           <MessageOutlined 
             key="messages" 
             style={{ color: 'steelblue' }} 
-            onClick={() => (alert('Message Admin'))} 
+            onClick={() => (history.push({
+              pathname: '/messages',
+              state: {prop_ID: this.props.prop_ID}
+            }))}
           />,
           <EditOutlined 
             key="edit" 
@@ -136,7 +139,12 @@ class PropertyCard extends React.Component {
     } else {
       cardActions =
         [
-          <MessageOutlined key="messages" style={{ color: 'steelblue' }} onClick={() => (alert('messageGoing'))} />
+          <MessageOutlined key="messages" 
+          style={{ color: 'steelblue' }} 
+          onClick={() => (history.push({
+            pathname: '/messages',
+            state: {prop_ID: this.props.prop_ID}
+          }))} />
         ];
     }
 
@@ -162,17 +170,14 @@ class PropertyCard extends React.Component {
       <>
         <Card
           style={{ width: 400 }}
-          onClick={() => (history.push({
-            pathname: '/propertyDetails',
-            state: {prop_ID: this.props.prop_ID}
-          }))}
           hoverable={true}
           loading={this.props.loading}
           actions={cardActions}>
           <Carousel autoplay dotPosition={'top'}>
             {photoList}
           </Carousel>
-          <Meta
+          <Meta 
+            style = {{  marginTop : 30}}
             title={this.props.title}
           />
           <br></br>
@@ -181,6 +186,13 @@ class PropertyCard extends React.Component {
           <p>Location: {this.props.location}</p>
           <p>Price: ${this.props.price}</p>
           {this.state.highPriority ? <p style={{ color: this.state.highPriority ? 'red' : 'steelblue' }}>High Priority!</p> : ''} {/* Show high priority label only when necessary.*/}
+          <div align="center">
+            <Button type="primary" shape="round" size='large' onClick={() => (history.push({
+              pathname: '/propertyDetails',
+              state: {prop_ID: this.props.prop_ID}
+            }))} > View Details </Button>
+          </div>
+          
         </Card>
       </>
     );
