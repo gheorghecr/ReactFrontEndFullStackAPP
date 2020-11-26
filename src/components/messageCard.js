@@ -89,6 +89,7 @@ class PropertyCard extends React.Component {
           <br></br>
           <p>Email from: {this.props.fromEmail}</p>
           <p>From: {this.props.fromName} </p>
+          <p>From Number: {this.props.fromNumber} </p>
           <p>Message: {this.props.messageText}</p>
           {this.state.archived ? <p>Message Archived</p> : ''}
         </Card>
