@@ -1,8 +1,10 @@
 import UserContext from '../contexts/user';
 import React from 'react';
-import { Form, Carousel, Image, Button } from 'antd';
+import { Form, Carousel, Image, Button, Input, InputNumber, Row, Col } from 'antd';
 import { status, json } from '../utilities/requestHandlers';
 import { withRouter } from 'react-router-dom';
+
+const { TextArea } = Input;
 
 const formItemLayout = {
   labelCol: { xs: { span: 24 }, sm: { span: 6 } },
@@ -12,6 +14,19 @@ const formItemLayout = {
 const tailFormItemLayout = {
   wrapperCol: { xs: { span: 24, offset: 0 }, sm: { span: 16, offset: 6 } },
 };
+
+const emailRules = [
+	{ type: 'email', message: 'The input is not valid E-mail!' },
+	{ required: true, message: 'Please input your E-mail!' }
+]
+
+const nameRules = [
+	{ required: true, message: 'Please input your name!', whitespace: true }
+]
+
+const messageRules = [
+  { required: true, message: 'Please input an message for the property!', whitespace: true }
+]
 
 /**
 * Registration form component for app signup.
@@ -103,11 +118,6 @@ class EditProperty extends React.Component {
         <Carousel autoplay dotPosition={'top'} style={{ padding: '2% 20%' }}>
           {photoList}
         </Carousel>
-        <div align="center" style={{marginBottom : 40}}>
-          <Button type="primary" shape="round" size='large'  align="center" >
-            Send a message about this property
-          </Button>
-        </div>
         <Form {...formItemLayout}>
           <Form.Item label="Description" >
             <p1>{this.state.propertyObject.description}</p1>
@@ -125,6 +135,30 @@ class EditProperty extends React.Component {
             <p1>{this.state.propertyObject.highPriority ? 'Yes' : 'No'}</p1>
           </Form.Item>
           <Form.Item {...tailFormItemLayout}>
+          </Form.Item>
+        </Form>
+
+        <h1 align="middle" style={{ padding: '2% 20%' }}>Send a Message to the Real State Agent</h1>
+        <Form {...formItemLayout} name="register" onFinish={this.onFinish} scrollToFirstError >
+          <Form.Item name="fromEmail" label="Your Email" rules={emailRules} required tooltip="This is a required field">
+            <Input />
+          </Form.Item>
+          <Form.Item name="fromName" label="Your Name" rules={nameRules} required tooltip="This is a required field">
+            <Input />
+          </Form.Item>
+          <Form.Item name="fromNumber" label="Your Number" tooltip="This is a required field">
+          <Input.Group compact>
+            <InputNumber style={{ width: '7%' }} defaultValue="+44" />
+            <InputNumber style={{ width: '20%' }} />
+          </Input.Group>
+          </Form.Item>
+          <Form.Item name="messageText" label="Message" rules={messageRules} required tooltip="This is a required field">
+            <TextArea rows={3}></TextArea>
+          </Form.Item>
+          <Form.Item {...tailFormItemLayout}>
+            <Button type="primary" htmlType="submit">
+              Send Message
+					</Button>
           </Form.Item>
         </Form>
       </>
