@@ -1,6 +1,6 @@
 import UserContext from '../contexts/user';
 import React from 'react';
-import { Form, Carousel, Image, Button, Input, InputNumber, Row, Col } from 'antd';
+import { Form, Carousel, Image, Button, Input, InputNumber, Alert } from 'antd';
 import { status, json } from '../utilities/requestHandlers';
 import { withRouter } from 'react-router-dom';
 
@@ -16,12 +16,12 @@ const tailFormItemLayout = {
 };
 
 const emailRules = [
-	{ type: 'email', message: 'The input is not valid E-mail!' },
-	{ required: true, message: 'Please input your E-mail!' }
+  { type: 'email', message: 'The input is not valid E-mail!' },
+  { required: true, message: 'Please input your E-mail!' }
 ]
 
 const nameRules = [
-	{ required: true, message: 'Please input your name!', whitespace: true }
+  { required: true, message: 'Please input your name!', whitespace: true }
 ]
 
 const messageRules = [
@@ -37,7 +37,13 @@ class EditProperty extends React.Component {
     super(props);
     this.state = {
       prop_ID: this.props.location.state.prop_ID,
+      success: false, // state to check when to show the alert
+      successMessage: ' ', // success alert message
+      error: false, // state to check when to show the alert
+      errorMessage: ' ', // error alert message
     };
+    this.onFinish = this.onFinish.bind(this);
+    this.componentWillMount = this.componentWillMount.bind(this);
   }
 
   static contextType = UserContext;
@@ -85,7 +91,76 @@ class EditProperty extends React.Component {
       });
   }
 
+  /**
+  * When user clicks on send message. Post data to the server.
+  */
+  onFinish = (values) => {
+    // remove error or success popUP message if there are any
+    this.setState({
+      error: false,
+      success: false,
+    })
+
+    console.log('Received values of add property form: ', values);
+    const { confirm, ...data } = values;  // ignore the 'confirm' value in data sent
+
+    console.log(this.props);
+    console.log(this.state);
+
+    data.propertyID = this.state.prop_ID
+    data.agentID = this.state.propertyObject.sellerID
+
+    fetch(`https://maximum-arena-3000.codio-box.uk/api/messages`, {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+      .then(status)
+      .then(json)
+      .then(dataFromServer => {
+        this.setState({
+          success: true,
+          successMessage: 'Message send successfully! Page will refresh automatically ...'
+        });
+        console.log(dataFromServer);
+        window.scrollTo(0, 0);
+      })
+      .catch(error => {
+        window.scrollTo(0, 0);
+        this.setState({
+          errorMessage: `${JSON.stringify(error.errorMessage)}`,
+          error: true
+        });
+      });
+  };
+
   render() {
+
+    /**
+    * Error Alert from ant design.
+    */
+    const errorMessage = (
+      <Alert
+        message="Error!"
+        description={this.state.errorMessage}
+        type="error"
+        showIcon
+      />
+    );
+
+    /**
+    * Success Alert from ant design.
+    */
+    const successMessage = (
+      <Alert
+        message={this.state.successMessage}
+        description=""
+        type="success"
+        showIcon
+      />
+    );
 
     // Show loading post while loading the data from the server
     if (!this.state.propertyObject) {
@@ -114,6 +189,9 @@ class EditProperty extends React.Component {
 
     return (
       <>
+        {this.state.success ? <div>{successMessage}</div> : ''}  {/* Show success message when property added successfully*/}
+        {this.state.error ? <div>{errorMessage}</div> : ''} {/* Show error message when property NOT added  successfully*/}
+
         <h1 align="middle" style={{ padding: '2% 20%' }}>{this.state.propertyObject.title}</h1>
         <Carousel autoplay dotPosition={'top'} style={{ padding: '2% 20%' }}>
           {photoList}
@@ -139,7 +217,7 @@ class EditProperty extends React.Component {
         </Form>
 
         <h1 align="middle" style={{ padding: '2% 20%' }}>Send a Message to the Real State Agent</h1>
-        <Form {...formItemLayout} name="register" onFinish={this.onFinish} scrollToFirstError >
+        <Form {...formItemLayout} id="sendMessage" name="sendMessage" onFinish={this.onFinish} scrollToFirstError >
           <Form.Item name="fromEmail" label="Your Email" rules={emailRules} required tooltip="This is a required field">
             <Input />
           </Form.Item>
@@ -147,10 +225,7 @@ class EditProperty extends React.Component {
             <Input />
           </Form.Item>
           <Form.Item name="fromNumber" label="Your Number" tooltip="This is a required field">
-          <Input.Group compact>
-            <InputNumber style={{ width: '7%' }} defaultValue="+44" />
-            <InputNumber style={{ width: '20%' }} />
-          </Input.Group>
+            <InputNumber style={{ width: '30%' }} defaultValue="+44" />
           </Form.Item>
           <Form.Item name="messageText" label="Message" rules={messageRules} required tooltip="This is a required field">
             <TextArea rows={3}></TextArea>
