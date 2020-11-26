@@ -164,7 +164,7 @@ class Messages extends React.Component {
       return (
         <div style={{ padding: "10px" }} key={message.messageID}>
           <Col span={6}>
-            <MessageCard {...message} history={this.props.history} deleteMessageFromMessageList={this.successMessage} errorMessage={this.errorMessage} />
+            <MessageCard {...message} history={this.props.history} deleteMessageFromMessageList={this.successMessage} errorMessage={this.errorMessage} successMessage={this.successMessage} />
           </Col>
         </div>
       )
@@ -199,6 +199,7 @@ class Messages extends React.Component {
         {this.state.error ? <div>{errorMessage}</div> : ''} {/* Show error message when needed*/}
         {this.state.success ? <div>{successMessage}</div> : ''}  {/* Show success message needed*/}
 
+        <h1 align="middle" style={{ padding: '2% 20%' }}>List Of Messages</h1>
         <Row type="flex" justify="space-around">
           {cardList}
         </Row>
