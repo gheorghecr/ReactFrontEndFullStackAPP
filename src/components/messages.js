@@ -3,7 +3,6 @@ import UserContext from '../contexts/user';
 import { Col, Row, Alert } from 'antd';
 import MessageCard from './messageCard';
 import { status, json } from '../utilities/requestHandlers';
-import { MessageOutlined } from '@ant-design/icons';
 
 
 /**
@@ -49,9 +48,6 @@ class Messages extends React.Component {
       })
       .catch(error => {
         console.log("Error fetching messages", error);
-        setTimeout(() => {
-          this.componentDidMount(); // keep requesting for properties
-        }, 2000);
       });
   }
 
@@ -77,9 +73,9 @@ class Messages extends React.Component {
       .then(dataFromServer => {
         this.setState({
           success: true,
+          successMessage: 'Property deleted successfully!',
+          successDescription: ' '
         });
-        console.log(dataFromServer);
-        // TODO
         // delete the post from the posts state
         this.deleteMessageFromMessageList(message_ID);
       })
@@ -99,7 +95,7 @@ class Messages extends React.Component {
    */
   deleteMessageFromMessageList = (message_ID) => {
     const messagesCopy = [...this.state.messages]
-    const indexToRemove = messagesCopy.findIndex(obj => obj.message_ID === message_ID);
+    const indexToRemove = messagesCopy.findIndex(obj => obj.messageID === message_ID);
     messagesCopy.splice(indexToRemove, 1);
     this.setState({
       messages: messagesCopy,
@@ -164,7 +160,7 @@ class Messages extends React.Component {
       return (
         <div style={{ padding: "10px" }} key={message.messageID}>
           <Col span={6}>
-            <MessageCard {...message} history={this.props.history} deleteMessageFromMessageList={this.successMessage} errorMessage={this.errorMessage} successMessage={this.successMessage} />
+            <MessageCard {...message} history={this.props.history} deleteMessageFromMessageList={this.deleteMessage} errorMessage={this.errorMessage} successMessage={this.successMessage} />
           </Col>
         </div>
       )
