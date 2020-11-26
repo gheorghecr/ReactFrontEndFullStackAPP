@@ -324,7 +324,7 @@ class EditProperty extends React.Component {
             <TextArea rows={6} />
           </Form.Item>
           <Form.Item name="location" label="Location" rules={locationRules} required tooltip="This is a required field" initialValue={this.state.propertyObject.location}>
-            <TextArea rows={3}>LOL</TextArea>
+            <TextArea rows={3}></TextArea>
           </Form.Item>
           <Form.Item name="price" label="Price" rules={priceRules} required tooltip="This is a required field" initialValue={this.state.propertyObject.price}>
             <InputNumber min={1} max={100000000000000} style={{ width: '20%' }} />
