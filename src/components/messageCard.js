@@ -2,7 +2,6 @@ import React from 'react';
 import { status, json } from '../utilities/requestHandlers';
 import UserContext from '../contexts/user';
 import { Card, Button } from 'antd';
-import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 
 const { Meta } = Card;
 
@@ -23,8 +22,6 @@ class PropertyCard extends React.Component {
   * This will retrieve all the messages for the current user.
   */
   componentDidMount() {
-    console.log(this.props.archived, 'props')
-    console.log(this.props, 'test')
     fetch(`https://maximum-arena-3000.codio-box.uk/api/messages/agent/${this.context.user.userID}`, {
       method: "GET",
       body: null,
@@ -35,7 +32,6 @@ class PropertyCard extends React.Component {
       .then(status)
       .then(json)
       .then(dataFromServer => {
-        console.log(dataFromServer, 'messages')
         this.setState({
           messages: dataFromServer
         });
