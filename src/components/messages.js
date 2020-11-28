@@ -88,11 +88,11 @@ class Messages extends React.Component {
 
   render() {
 
-    const cardList = this.state.messages.map(message => {
+    const cardList = this.state.messages.map(messageObject => {
       return (
-        <div style={{ padding: "10px" }} key={message.messageID}>
+        <div style={{ padding: "10px" }} key={messageObject.messageID}>
           <Col span={6}>
-            <MessageCard {...message} history={this.props.history} deleteMessageFromMessageList={this.deleteMessage} />
+            <MessageCard {...messageObject} history={this.props.history} deleteMessageFromMessageList={this.deleteMessage} />
           </Col>
         </div>
       )
