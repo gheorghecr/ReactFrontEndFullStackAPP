@@ -26,6 +26,7 @@ class Messages extends React.Component {
   * Fetch all the messages for the current user.
   */
   componentDidMount() {
+    console.log(this.state, 'state here component')
     fetch(`https://maximum-arena-3000.codio-box.uk/api/messages/agent/${this.context.user.userID}`, {
       method: "GET",
       body: null,
@@ -41,6 +42,9 @@ class Messages extends React.Component {
         this.setState({ loading: false })
       })
       .catch(error => {
+        this.setState({
+          loading: false
+        })
         console.log("Error fetching messages", error);
         message.error(`Error fetching messages`, 10);
       });
@@ -67,7 +71,6 @@ class Messages extends React.Component {
         this.deleteMessageFromMessageList(message_ID);
       })
       .catch(error => {
-        window.scrollTo(0, 0);
         message.error(`${JSON.stringify(error.errorMessage)}`, 10);
       });
   }
@@ -87,7 +90,7 @@ class Messages extends React.Component {
   }
 
   render() {
-
+    console.log(this.state, 'state here')
     const cardList = this.state.messages.map(messageObject => {
       return (
         <div style={{ padding: "10px" }} key={messageObject.messageID}>
@@ -99,7 +102,7 @@ class Messages extends React.Component {
     });
 
     // Show loading messages while loading the data from the server
-    if (!this.state.messages.length) {
+    if (!this.state.messages.length && this.state.loading === true) {
       return (
         <Row type="flex" justify="space-around">
           <div style={{ padding: "10px" }} >
@@ -118,6 +121,17 @@ class Messages extends React.Component {
             </Col>
           </div>
         </Row>
+      )
+    }
+
+    // Show message if there are no properties
+    if (!this.state.messages.length && this.state.loading === false) {
+      return (
+        <>
+        <Row type="flex" justify="space-around">
+         <h1> There are no messages</h1>
+        </Row>
+      </>
       )
     }
 
