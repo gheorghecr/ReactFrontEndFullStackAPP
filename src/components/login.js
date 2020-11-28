@@ -47,7 +47,6 @@ class LoginForm extends React.Component {
 			error: false // remove error banner if there already
 		});
         const { username, password } = values;
-        console.log(`logging in user: ${username}`)
         fetch('https://maximum-arena-3000.codio-box.uk/api/users/login', {
             method: "POST",
             headers: {
