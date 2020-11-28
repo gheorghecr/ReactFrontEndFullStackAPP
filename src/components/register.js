@@ -74,10 +74,6 @@ class RegistrationForm extends React.Component {
 		super(props);
 		this.state = {
 			selectedFile: null,
-			// loading: false,
-			// success: false, // state to check when to show the alert
-			// error: false, // state to check when to show the alert
-			// errorMessage: ' ', // error alert message
 		};
 		this.onFinish = this.onFinish.bind(this);
 		this.onFinishFailed = this.onFinishFailed.bind(this);
