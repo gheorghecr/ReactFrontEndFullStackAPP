@@ -1,6 +1,6 @@
 import React from 'react';
 import UserContext from '../contexts/user';
-import { Col, Row, Alert } from 'antd';
+import { Col, Row, message } from 'antd';
 import MessageCard from './messageCard';
 import { status, json } from '../utilities/requestHandlers';
 
@@ -17,12 +17,6 @@ class Messages extends React.Component {
     this.state = {
       messages: [],
       loading: true,
-      success: false, // state to check when to show the alert
-      successMessage: '', // success alert message
-      successDescription: '',
-      error: false, // state to check when to show the alert
-      errorMessage: ' ', // error alert message
-      errorDescription: '',
     }
   }
 
@@ -48,12 +42,9 @@ class Messages extends React.Component {
       })
       .catch(error => {
         console.log("Error fetching messages", error);
+        message.error(`Error fetching messages`, 10);
       });
   }
-
-  // updateWindowDimensions() {
-  //   this.setState({ width: window.innerWidth, height: window.innerHeight });
-  // }
 
   /**
   * Delete an message by it's ID. This is triggered from the child component.
@@ -71,20 +62,13 @@ class Messages extends React.Component {
       .then(status)
       .then(json)
       .then(dataFromServer => {
-        this.setState({
-          success: true,
-          successMessage: 'Property deleted successfully!',
-          successDescription: ' '
-        });
+        message.success('Message deleted successfully', 4);
         // delete the post from the posts state
         this.deleteMessageFromMessageList(message_ID);
       })
       .catch(error => {
         window.scrollTo(0, 0);
-        this.setState({
-          errorMessage: `${JSON.stringify(error.errorMessage)}`,
-          error: true
-        });
+        message.error(`${JSON.stringify(error.errorMessage)}`, 10);
       });
   }
 
@@ -102,65 +86,13 @@ class Messages extends React.Component {
     });
   }
 
-  /**
-  * Method to popUP a error message with a custom message.
-  *
-  * @param {string} title Title for the error message.
-  * @param {string} description Description for the error message.
-  */
-  errorMessage = (title, description) => {
-    this.setState({
-      error: true,
-      errorMessage: title,
-      errorDescription: description,
-    });
-  }
-
-  /**
-   * Method to popUP a error message with a custom message.
-   *
-   * @param {string} title Title for the error message.
-   * @param {string} description Description for the error message.
-   */
-  successMessage = (title, description) => {
-    this.setState({
-      success: true,
-      successMessage: title,
-      successDescription: description,
-    });
-  }
-
   render() {
-
-    /**
-    * Error Alert from ant design.
-    */
-    const errorMessage = (
-      <Alert
-        message={this.state.errorMessage}
-        description={this.state.errorDescription}
-        type="error"
-        showIcon
-      />
-    );
-
-    /**
-    * Success Alert from ant design.
-    */
-    const successMessage = (
-      <Alert
-        message={this.state.successMessage}
-        description={this.state.successDescription}
-        type="success"
-        showIcon
-      />
-    );
 
     const cardList = this.state.messages.map(message => {
       return (
         <div style={{ padding: "10px" }} key={message.messageID}>
           <Col span={6}>
-            <MessageCard {...message} history={this.props.history} deleteMessageFromMessageList={this.deleteMessage} errorMessage={this.errorMessage} successMessage={this.successMessage} />
+            <MessageCard {...message} history={this.props.history} deleteMessageFromMessageList={this.deleteMessage} />
           </Col>
         </div>
       )
@@ -191,10 +123,6 @@ class Messages extends React.Component {
 
     return (
       <>
-
-        {this.state.error ? <div>{errorMessage}</div> : ''} {/* Show error message when needed*/}
-        {this.state.success ? <div>{successMessage}</div> : ''}  {/* Show success message needed*/}
-
         <h1 align="middle" style={{ padding: '2% 20%' }}>List Of Messages</h1>
         <Row type="flex" justify="space-around">
           {cardList}

@@ -64,12 +64,10 @@ class PropertyCard extends React.Component {
           highPriority: !this.state.highPriority,
         });
         message.success('High Priority attribute toggled successfully!', 4);
-        //this.props.successMessage('High Priority Toggled successfully!', ' ');
         console.log(dataFromServer);
       })
       .catch(error => {
         message.error('Could not toggle high priority attribute. Try Again!', 10);
-        //this.props.errorMessage('Error Occurred', 'Could not toggle high priority attribute. Try Again!');
       });
   }
 
@@ -90,12 +88,10 @@ class PropertyCard extends React.Component {
         this.setState({
           visibility: !this.state.visibility,
         });
-        //this.props.successMessage('Visibility Toggled successfully!', ' ');
         message.success('Visibility Toggled successfully!', 4);
       })
       .catch(error => {
         message.error('Could not toggle visibility attribute. Try Again!', 10);
-        //this.props.errorMessage('Error Occurred', 'Could not toggle visibility attribute. Try Again!');
       });
   }
 

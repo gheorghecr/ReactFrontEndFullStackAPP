@@ -1,6 +1,6 @@
 import React from 'react';
 import UserContext from '../contexts/user';
-import { Form, Input, Button, Alert} from 'antd';
+import { Form, Input, Button, message} from 'antd';
 import { status, json } from '../utilities/requestHandlers';
 import { withRouter } from 'react-router-dom';
 
@@ -31,9 +31,6 @@ class LoginForm extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			success: false, // state to check when to show the alert
-			error: false, // state to check when to show the alert
-			errorMessage: ' ', // error alert message
 		};
 		this.login = this.login.bind(this);
         this.onFinishFailed = this.onFinishFailed.bind(this);
@@ -60,11 +57,7 @@ class LoginForm extends React.Component {
             .then(status)
             .then(json)
             .then(user => {
-                console.log(user);
-                this.setState({
-					success: true
-                });
-                window.scrollTo(0, 0);
+				message.success('Login successfully! You will be redirected to home page.' , 4);
 				this.context.login(user, password);
                 setTimeout(() => {
 					this.props.history.push('/')
@@ -72,10 +65,7 @@ class LoginForm extends React.Component {
             })
             .catch(error => {
                 window.scrollTo(0, 0); 
-				this.setState({
-					errorMessage: `${JSON.stringify(error.errorMessage)}`,
-					error: true
-				});
+				message.error(`${JSON.stringify(error.errorMessage)}`, 10);
             });
     }
 
@@ -87,35 +77,9 @@ class LoginForm extends React.Component {
 	};
 
 	render() {
-		/**
-		* Error Alert from ant design.
-		*/
-		const errorMessage = (
-			<Alert
-				message="Error"
-				description= {this.state.errorMessage}
-				type="error"
-				showIcon
-			/>
-		);
-
-		/**
-		* Success Alert from ant design.
-		*/
-		const successMessage = (
-			<Alert
-				message="Login successfully!"
-				description="You will be redirected to home page."
-				type="success"
-				showIcon
-			/>
-		);
-
+	
 		return (
 			<>
-				{this.state.success ? <div>{successMessage}</div> : ''}  {/* Show success message when user logs in successfully*/}
-				{this.state.error ? <div>{errorMessage}</div> : ''} {/* Show error message when user does not log in successfully*/}
-
 				<h1 align="middle" style={{ padding: '2% 20%' }}>Login</h1>
 				<Form {...formItemLayout} name="register" onFinish={this.login} scrollToFirstError onFinishFailed={this.onFinishFailed}>
 					<Form.Item name="username" label="Username" rules={usernameRules}>

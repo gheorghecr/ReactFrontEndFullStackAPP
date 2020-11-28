@@ -37,10 +37,6 @@ class EditProperty extends React.Component {
     super(props);
     this.state = {
       prop_ID: this.props.location.state.prop_ID,
-      success: false, // state to check when to show the alert
-      successMessage: ' ', // success alert message
-      error: false, // state to check when to show the alert
-      errorMessage: ' ', // error alert message
     };
     this.onFinish = this.onFinish.bind(this);
     this.componentWillMount = this.componentWillMount.bind(this);

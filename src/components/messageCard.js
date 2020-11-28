@@ -61,19 +61,16 @@ class PropertyCard extends React.Component {
           archived: !this.state.archived,
         });
         message.success('Archived property toggled successfully!', 4);
-        //this.props.successMessage('Message toggled successfully!', ' ');
       })
       .catch(error => {
         console.log(error)
         message.error('Could not toggle archived attribute. Try Again!', 10);
-        //this.props.errorMessage('Error Occurred', 'Could not toggle archived attribute. Try Again!');
       });
   }
 
   // on deletion of property
   confirm(e) {
     this.props.deleteMessageFromMessageList(this.props.messageID)
-    message.success('Click on Yes');
   }
 
   // Cancel deletion
