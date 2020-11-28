@@ -1,6 +1,6 @@
 import UserContext from '../contexts/user';
 import React from 'react';
-import { Form, Carousel, Image, Button, Input, InputNumber, Alert } from 'antd';
+import { Form, Carousel, Image, Button, Input, InputNumber, message } from 'antd';
 import { status, json } from '../utilities/requestHandlers';
 import { withRouter } from 'react-router-dom';
 
@@ -87,7 +87,7 @@ class EditProperty extends React.Component {
         });
       })
       .catch(error => {
-
+        message.error('Could not retrieve the images!', 5);
       });
   }
 
@@ -120,47 +120,15 @@ class EditProperty extends React.Component {
       .then(status)
       .then(json)
       .then(dataFromServer => {
-        this.setState({
-          success: true,
-          successMessage: 'Message send successfully! Page will refresh automatically ...'
-        });
-        console.log(dataFromServer);
-        window.scrollTo(0, 0);
+        message.success('Message send successfully!', 4);
       })
       .catch(error => {
         window.scrollTo(0, 0);
-        this.setState({
-          errorMessage: `${JSON.stringify(error.errorMessage)}`,
-          error: true
-        });
+        message.error(`${JSON.stringify(error.errorMessage)}`, 10);
       });
   };
 
   render() {
-
-    /**
-    * Error Alert from ant design.
-    */
-    const errorMessage = (
-      <Alert
-        message="Error!"
-        description={this.state.errorMessage}
-        type="error"
-        showIcon
-      />
-    );
-
-    /**
-    * Success Alert from ant design.
-    */
-    const successMessage = (
-      <Alert
-        message={this.state.successMessage}
-        description=""
-        type="success"
-        showIcon
-      />
-    );
 
     // Show loading post while loading the data from the server
     if (!this.state.propertyObject) {
@@ -189,9 +157,6 @@ class EditProperty extends React.Component {
 
     return (
       <>
-        {this.state.success ? <div>{successMessage}</div> : ''}  {/* Show success message when property added successfully*/}
-        {this.state.error ? <div>{errorMessage}</div> : ''} {/* Show error message when property NOT added  successfully*/}
-
         <h1 align="middle" style={{ padding: '2% 20%' }}>{this.state.propertyObject.title}</h1>
         <Carousel autoplay dotPosition={'top'} style={{ padding: '2% 20%' }}>
           {photoList}
