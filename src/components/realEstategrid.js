@@ -1,6 +1,6 @@
 import React from 'react';
 import UserContext from '../contexts/user';
-import { Col, Row, Alert, Button } from 'antd';
+import { Col, Row, Button, message } from 'antd';
 import { withRouter } from 'react-router-dom';
 import PropertyCard from './propertyCard';
 import { status, json } from '../utilities/requestHandlers';
@@ -11,12 +11,6 @@ class RealEstateGrid extends React.Component {
     this.state = {
       posts: [],
       loading: true,
-      success: false, // state to check when to show the alert
-      successMessage: '', // success alert message
-      successDescription: '',
-      error: false, // state to check when to show the alert
-      errorMessage: ' ', // error alert message
-      errorDescription: '',
     }
   }
 
@@ -36,19 +30,13 @@ class RealEstateGrid extends React.Component {
       .then(status)
       .then(json)
       .then(dataFromServer => {
-        this.setState({
-          success: true,
-        });
-        console.log(dataFromServer);
         // delete the post from the posts state
         this.deletePropertyFromPosts(prop_ID);
+        message.success('Property deleted successfully', 4);
       })
       .catch(error => {
         window.scrollTo(0, 0);
-        this.setState({
-          errorMessage: `${JSON.stringify(error.errorMessage)}`,
-          error: true
-        });
+        message.error(`${JSON.stringify(error.errorMessage)}`, 10);
       });
   }
 
@@ -63,34 +51,6 @@ class RealEstateGrid extends React.Component {
 
     this.setState({
       posts: postsCopy,
-    });
-  }
-
-  /**
-  * Method to popUP a error message with a custom message.
-  *
-  * @param {string} title Title for the error message.
-  * @param {string} description Description for the error message.
-  */
-  errorMessage = (title, description) => {
-    this.setState({
-      error: true,
-      errorMessage: title,
-      errorDescription: description,
-    });
-  }
-
-  /**
-   * Method to popUP a error message with a custom message.
-   *
-   * @param {string} title Title for the error message.
-   * @param {string} description Description for the error message.
-   */
-  successMessage = (title, description) => {
-    this.setState({
-      success: true,
-      successMessage: title,
-      successDescription: description,
     });
   }
 
@@ -116,7 +76,6 @@ class RealEstateGrid extends React.Component {
       .then(status)
       .then(json)
       .then(data => {
-        console.log(data)
         this.setState({ posts: data })
         this.setState({ loading: false })
       })
@@ -129,30 +88,6 @@ class RealEstateGrid extends React.Component {
   }
 
   render() {
-
-    /**
-    * Error Alert from ant design.
-    */
-    const errorMessage = (
-      <Alert
-        message={this.state.errorMessage}
-        description={this.state.errorDescription}
-        type="error"
-        showIcon
-      />
-    );
-
-    /**
-    * Success Alert from ant design.
-    */
-    const successMessage = (
-      <Alert
-        message={this.state.successMessage}
-        description={this.state.successDescription}
-        type="success"
-        showIcon
-      />
-    );
 
     // Show loading post while loading the data from the server
     if (!this.state.posts.length) {
@@ -180,7 +115,7 @@ class RealEstateGrid extends React.Component {
       return (
         <div style={{ padding: "10px" }} key={post.prop_ID}>
           <Col span={6}>
-            <PropertyCard {...post} history={this.props.history} deleteProperty={this.deleteProperty} successMessage={this.successMessage} errorMessage={this.errorMessage} />
+            <PropertyCard {...post} history={this.props.history} deleteProperty={this.deleteProperty} />
           </Col>
         </div>
       )
@@ -188,9 +123,6 @@ class RealEstateGrid extends React.Component {
 
     return (
       <>
-        {this.state.error ? <div>{errorMessage}</div> : ''} {/* Show error message when needed*/}
-        {this.state.success ? <div>{successMessage}</div> : ''}  {/* Show success message needed*/}
-
 
         <Row type="flex" justify="space-around">
           {/* Show the add a property button only if an admin is logged in */}
