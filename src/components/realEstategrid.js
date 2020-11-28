@@ -81,16 +81,22 @@ class RealEstateGrid extends React.Component {
       })
       .catch(error => {
         console.log("Error fetching properties", error);
-        setTimeout(() => {
-          this.componentDidMount(); // keep requesting for properties
-        }, 2000);
+        if (error.message === 'No properties available') {
+          message.error('No properties available', 3)
+          this.setState({
+            loading: false,
+          })
+        } else {
+          message.error(error.message, 5)
+        }
+        
       });
   }
 
   render() {
 
     // Show loading post while loading the data from the server
-    if (!this.state.posts.length) {
+    if (!this.state.posts.length && this.state.loading === true) {
       return (
         <Row type="flex" justify="space-around">
           <div style={{ padding: "10px" }} >
@@ -111,6 +117,39 @@ class RealEstateGrid extends React.Component {
         </Row>
       )
     }
+
+    // Show message if there are no properties
+    if (!this.state.posts.length && this.state.loading === false) {
+      return (
+        <>
+        <Row type="flex" justify="space-around">
+          {/* Show the add a property button only if an admin is logged in */}
+        {this.context.user.role === 'admin' ?
+          <div style={{ marginLeft: "60px", marginBottom: "20px" }} align="start">
+            <Button type="primary" shape="round" size='large' onClick={() => (this.props.history.push({
+              pathname: '/addProperty',
+              state: { prop_ID: this.props.prop_ID }
+            }))} > Add a Property </Button>
+          </div>
+          : " "}
+
+          {/* Show the see my messages button only if an admin is logged in */}
+          {this.context.user.role === 'admin' ?
+            <div style={{ marginLeft: "60px", marginBottom: "20px" }} align="start">
+              <Button type="primary" shape="round" size='large' onClick={() => (this.props.history.push({
+                pathname: '/messages',
+                state: { prop_ID: this.props.prop_ID }
+              }))} > See my messages </Button>
+            </div>
+            : " "}
+        </Row>
+        <Row type="flex" justify="space-around">
+         <h1> There are no properties</h1>
+        </Row>
+      </>
+      )
+    }
+
     const cardList = this.state.posts.map(post => {
       return (
         <div style={{ padding: "10px" }} key={post.prop_ID}>
@@ -144,7 +183,6 @@ class RealEstateGrid extends React.Component {
               }))} > See my messages </Button>
             </div>
             : " "}
-
         </Row>
 
         <Row type="flex" justify="space-around">
