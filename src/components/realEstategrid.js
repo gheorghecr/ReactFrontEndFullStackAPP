@@ -1,6 +1,6 @@
 import React from 'react';
 import UserContext from '../contexts/user';
-import { Col, Row, Alert } from 'antd';
+import { Col, Row, Alert, Button } from 'antd';
 import { withRouter } from 'react-router-dom';
 import PropertyCard from './propertyCard';
 import { status, json } from '../utilities/requestHandlers';
@@ -123,8 +123,8 @@ class RealEstateGrid extends React.Component {
       .catch(error => {
         console.log("Error fetching properties", error);
         setTimeout(() => {
-					this.componentDidMount(); // keep requesting for properties
-				}, 2000);
+          this.componentDidMount(); // keep requesting for properties
+        }, 2000);
       });
   }
 
@@ -190,6 +190,30 @@ class RealEstateGrid extends React.Component {
       <>
         {this.state.error ? <div>{errorMessage}</div> : ''} {/* Show error message when needed*/}
         {this.state.success ? <div>{successMessage}</div> : ''}  {/* Show success message needed*/}
+
+
+        <Row type="flex" justify="space-around">
+          {/* Show the add a property button only if an admin is logged in */}
+        {this.context.user.role === 'admin' ?
+          <div style={{ marginLeft: "60px", marginBottom: "20px" }} align="start">
+            <Button type="primary" shape="round" size='large' onClick={() => (this.props.history.push({
+              pathname: '/addProperty',
+              state: { prop_ID: this.props.prop_ID }
+            }))} > Add a Property </Button>
+          </div>
+          : " "}
+
+          {/* Show the see my messages button only if an admin is logged in */}
+          {this.context.user.role === 'admin' ?
+            <div style={{ marginLeft: "60px", marginBottom: "20px" }} align="start">
+              <Button type="primary" shape="round" size='large' onClick={() => (this.props.history.push({
+                pathname: '/messages',
+                state: { prop_ID: this.props.prop_ID }
+              }))} > See my messages </Button>
+            </div>
+            : " "}
+
+        </Row>
 
         <Row type="flex" justify="space-around">
           {cardList}
