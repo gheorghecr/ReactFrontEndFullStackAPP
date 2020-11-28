@@ -21,29 +21,6 @@ class PropertyCard extends React.Component {
   static contextType = UserContext;
 
   /**
-  * This will retrieve all the messages for the current user.
-  */
-  componentDidMount() {
-    fetch(`https://maximum-arena-3000.codio-box.uk/api/messages/agent/${this.context.user.userID}`, {
-      method: "GET",
-      body: null,
-      headers: {
-        "Authorization": "Basic " + btoa(this.context.user.username + ":" + this.context.user.password)
-      }
-    })
-      .then(status)
-      .then(json)
-      .then(dataFromServer => {
-        this.setState({
-          messages: dataFromServer
-        });
-      })
-      .catch(error => {
-        message.error('Could not retrieve your messages. Try Again!', 10);
-      });
-  }
-
-  /**
    * Function that toggles the archived attribute for a message.
    */
   toggleArchived() {
