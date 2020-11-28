@@ -37,7 +37,6 @@ class PropertyCard extends React.Component {
       .then(status)
       .then(json)
       .then(dataFromServer => {
-        console.log(dataFromServer, 'images')
         this.setState({
           propertyImagesName: dataFromServer
         });
@@ -64,11 +63,13 @@ class PropertyCard extends React.Component {
         this.setState({
           highPriority: !this.state.highPriority,
         });
-        this.props.successMessage('High Priority Toggled successfully!', ' ');
+        message.success('High Priority attribute toggled successfully!', 4);
+        //this.props.successMessage('High Priority Toggled successfully!', ' ');
         console.log(dataFromServer);
       })
       .catch(error => {
-        this.props.errorMessage('Error Occurred', 'Could not toggle high priority attribute. Try Again!');
+        message.error('Could not toggle high priority attribute. Try Again!', 10);
+        //this.props.errorMessage('Error Occurred', 'Could not toggle high priority attribute. Try Again!');
       });
   }
 
@@ -89,18 +90,17 @@ class PropertyCard extends React.Component {
         this.setState({
           visibility: !this.state.visibility,
         });
-        this.props.successMessage('Visibility Toggled successfully!', ' ');
-        console.log(dataFromServer);
+        //this.props.successMessage('Visibility Toggled successfully!', ' ');
+        message.success('Visibility Toggled successfully!', 4);
       })
       .catch(error => {
-        this.props.errorMessage('Error Occurred', 'Could not toggle visibility attribute. Try Again!');
+        message.error('Could not toggle visibility attribute. Try Again!', 10);
+        //this.props.errorMessage('Error Occurred', 'Could not toggle visibility attribute. Try Again!');
       });
   }
 
   confirm(e) {
-    console.log(this.props)
     this.props.deleteProperty(this.props.prop_ID)
-    message.success('Click on Yes');
   }
 
   // Cancel deletion
@@ -144,7 +144,6 @@ class PropertyCard extends React.Component {
           >
             <DeleteOutlined
               key="delete"
-              //onClick={() => (this.props.deleteProperty(this.props.prop_ID))}
               style={{ color: 'steelblue' }}
             />
           </Popconfirm>

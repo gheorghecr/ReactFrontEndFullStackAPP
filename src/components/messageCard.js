@@ -39,6 +39,7 @@ class PropertyCard extends React.Component {
         });
       })
       .catch(error => {
+        message.error('Could not retrieve your messages. Try Again!', 10);
       });
   }
 
@@ -59,11 +60,13 @@ class PropertyCard extends React.Component {
         this.setState({
           archived: !this.state.archived,
         });
-        this.props.successMessage('Message toggled successfully!', ' ');
+        message.success('Archived property toggled successfully!', 4);
+        //this.props.successMessage('Message toggled successfully!', ' ');
       })
       .catch(error => {
         console.log(error)
-        this.props.errorMessage('Error Occurred', 'Could not toggle archived attribute. Try Again!');
+        message.error('Could not toggle archived attribute. Try Again!', 10);
+        //this.props.errorMessage('Error Occurred', 'Could not toggle archived attribute. Try Again!');
       });
   }
 
