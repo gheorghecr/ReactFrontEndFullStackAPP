@@ -2,7 +2,6 @@ import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import Nav from './components/nav';
-import Account from './components/account';
 import Register from './components/register';
 import Login from './components/login';
 import Home from './components/home';
@@ -60,7 +59,6 @@ class App extends React.Component {
             <Content>
               <Switch>
                 <Route path="/" children={<Home />} exact />
-                <Route path="/account" children={<Account />} />
                 <Route path="/register" children={<Register />} />
                 <Route path="/login" children={<Login />} />
                 <Route path="/addProperty" children={<AddPropertyForm />} />
