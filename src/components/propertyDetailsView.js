@@ -100,8 +100,13 @@ class EditProperty extends React.Component {
     console.log('Received values of add property form: ', values);
     const { confirm, ...data } = values;  // ignore the 'confirm' value in data sent
 
-    console.log(this.props);
-    console.log(this.state);
+    console.log(data);
+
+    if(typeof data.fromNumber === 'undefined') {
+      delete data.fromNumber; //Don't send this as user did not input the numer
+    }
+
+    console.log(data);
 
     data.propertyID = this.state.prop_ID
     data.agentID = this.state.propertyObject.sellerID
@@ -120,7 +125,7 @@ class EditProperty extends React.Component {
       })
       .catch(error => {
         window.scrollTo(0, 0);
-        message.error(`${JSON.stringify(error.errorMessage)}`, 10);
+        message.error(`${JSON.stringify(error)}`, 10);
       });
   };
 
