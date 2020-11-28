@@ -11,7 +11,10 @@ class RealEstateGrid extends React.Component {
     this.state = {
       posts: [],
       loading: true,
+      highPriority: false, // used to know when the user is filtering by high Priority or not
     }
+    this.toggleHighPriorityState = this.toggleHighPriorityState.bind(this);
+    this.componentDidMount = this.componentDidMount.bind(this);
   }
 
   static contextType = UserContext;
@@ -59,12 +62,22 @@ class RealEstateGrid extends React.Component {
   */
   componentDidMount() {
     let fetchLink;
-    // Fetch request depends on the user role
+    // Fetch request depends on the user role and if is filtered high priority or not
     if (this.context.user.role === 'admin') {
-      fetchLink = 'https://maximum-arena-3000.codio-box.uk/api/properties/adminview';
+      if (this.state.highPriority === true) {
+        fetchLink = 'https://maximum-arena-3000.codio-box.uk/api/properties/adminview/highPriority';
+      } else {
+        fetchLink = 'https://maximum-arena-3000.codio-box.uk/api/properties/adminview';
+      }
     } else {
-      fetchLink = 'https://maximum-arena-3000.codio-box.uk/api/properties';
+      if (this.state.highPriority === true) {
+        fetchLink = 'https://maximum-arena-3000.codio-box.uk/api/properties/highpriority';
+      } else {
+        fetchLink = 'https://maximum-arena-3000.codio-box.uk/api/properties';
+      }
     }
+
+    console.log(fetchLink, 'fetch link')
 
     fetch(fetchLink, {
       method: "GET",
@@ -76,21 +89,42 @@ class RealEstateGrid extends React.Component {
       .then(status)
       .then(json)
       .then(data => {
+        console.log(data)
         this.setState({ posts: data })
         this.setState({ loading: false })
       })
       .catch(error => {
         console.log("Error fetching properties", error);
-        if (error.message === 'No properties available') {
+        if (error.message === 'No properties available' || error.message === 'No properties available marked as High Priority') {
           message.error('No properties available', 3)
           this.setState({
             loading: false,
           })
         } else {
+          this.setState({
+            loading: false,
+          })
           message.error(error.message, 5)
         }
-        
       });
+  }
+
+  /**
+  * Used to toggle the state that is reportable to request the properties 
+  * by high Priority or not.
+  * 
+  */
+  toggleHighPriorityState() {
+    this.setState({
+      highPriority: !this.state.highPriority,
+      loading: true,
+      posts: [],
+    })
+
+    // give time to set the state before mounting the component again
+    setTimeout(() => {
+      this.componentDidMount();
+    }, 500);
   }
 
   render() {
@@ -98,23 +132,31 @@ class RealEstateGrid extends React.Component {
     // Show loading post while loading the data from the server
     if (!this.state.posts.length && this.state.loading === true) {
       return (
-        <Row type="flex" justify="space-around">
+        <>
+          <Row type="flex" justify="space-around">
+            {/* Button to request by high priority or not */}
+            <div style={{ marginLeft: "60px", marginBottom: "20px" }} align="start">
+              <Button type="primary" shape="round" size='large' onClick={() => (this.toggleHighPriorityState())} > {this.state.highPriority ? "List All" : "List High Priority Only"}</Button>
+            </div>
+          </Row>
+          <Row type="flex" justify="space-around">
+            <div style={{ padding: "10px" }} >
+              <Col span={6}>
+                <PropertyCard {...this.state} />
+              </Col>
+            </div>,
           <div style={{ padding: "10px" }} >
-            <Col span={6}>
-              <PropertyCard {...this.state} />
-            </Col>
-          </div>,
-          <div style={{ padding: "10px" }} >
-            <Col span={6}>
-              <PropertyCard {...this.state} />
-            </Col>
-          </div>
-          <div style={{ padding: "10px" }} >
-            <Col span={6}>
-              <PropertyCard {...this.state} />
-            </Col>
-          </div>
-        </Row>
+              <Col span={6}>
+                <PropertyCard {...this.state} />
+              </Col>
+            </div>
+            <div style={{ padding: "10px" }} >
+              <Col span={6}>
+                <PropertyCard {...this.state} />
+              </Col>
+            </div>
+          </Row>
+        </>
       )
     }
 
@@ -122,31 +164,40 @@ class RealEstateGrid extends React.Component {
     if (!this.state.posts.length && this.state.loading === false) {
       return (
         <>
-        <Row type="flex" justify="space-around">
-          {/* Show the add a property button only if an admin is logged in */}
-        {this.context.user.role === 'admin' ?
-          <div style={{ marginLeft: "60px", marginBottom: "20px" }} align="start">
-            <Button type="primary" shape="round" size='large' onClick={() => (this.props.history.push({
-              pathname: '/addProperty',
-              state: { prop_ID: this.props.prop_ID }
-            }))} > Add a Property </Button>
-          </div>
-          : " "}
+          <Row type="flex" justify="space-around">
+            {/* Show the add a property button only if an admin is logged in */}
+            {this.context.user.role === 'admin' ?
+              <div style={{ marginLeft: "60px", marginBottom: "20px" }} align="start">
+                <Button type="primary" shape="round" size='large' onClick={() => (this.props.history.push({
+                  pathname: '/addProperty',
+                  state: { prop_ID: this.props.prop_ID }
+                }))} > Add a Property </Button>
+              </div>
+              : " "}
 
-          {/* Show the see my messages button only if an admin is logged in */}
-          {this.context.user.role === 'admin' ?
-            <div style={{ marginLeft: "60px", marginBottom: "20px" }} align="start">
-              <Button type="primary" shape="round" size='large' onClick={() => (this.props.history.push({
-                pathname: '/messages',
-                state: { prop_ID: this.props.prop_ID }
-              }))} > See my messages </Button>
+            {/* Show the see my messages button only if an admin is logged in */}
+            {this.context.user.role === 'admin' ?
+              <div style={{ marginLeft: "60px", marginBottom: "20px" }} align="start">
+                <Button type="primary" shape="round" size='large' onClick={() => (this.props.history.push({
+                  pathname: '/messages',
+                  state: { prop_ID: this.props.prop_ID }
+                }))} > See my messages </Button>
+              </div>
+              : " "}
+
+
+            {/* Button to list all properties again when user request high priority properties and there are node*/}
+            {this.state.highPriority ? <div style={{ marginLeft: "60px", marginBottom: "20px" }} align="start">
+              <Button type="primary" shape="round" size='large' onClick={() => (this.toggleHighPriorityState())} > {this.state.highPriority ? "List All" : "List High Priority Only"}</Button>
             </div>
-            : " "}
-        </Row>
-        <Row type="flex" justify="space-around">
-         <h1> There are no properties</h1>
-        </Row>
-      </>
+              : ' '}
+
+
+          </Row>
+          <Row type="flex" justify="space-around">
+            <h1> There are no properties</h1>
+          </Row>
+        </>
       )
     }
 
@@ -165,14 +216,14 @@ class RealEstateGrid extends React.Component {
 
         <Row type="flex" justify="space-around">
           {/* Show the add a property button only if an admin is logged in */}
-        {this.context.user.role === 'admin' ?
-          <div style={{ marginLeft: "60px", marginBottom: "20px" }} align="start">
-            <Button type="primary" shape="round" size='large' onClick={() => (this.props.history.push({
-              pathname: '/addProperty',
-              state: { prop_ID: this.props.prop_ID }
-            }))} > Add a Property </Button>
-          </div>
-          : " "}
+          {this.context.user.role === 'admin' ?
+            <div style={{ marginLeft: "60px", marginBottom: "20px" }} align="start">
+              <Button type="primary" shape="round" size='large' onClick={() => (this.props.history.push({
+                pathname: '/addProperty',
+                state: { prop_ID: this.props.prop_ID }
+              }))} > Add a Property </Button>
+            </div>
+            : " "}
 
           {/* Show the see my messages button only if an admin is logged in */}
           {this.context.user.role === 'admin' ?
@@ -183,6 +234,12 @@ class RealEstateGrid extends React.Component {
               }))} > See my messages </Button>
             </div>
             : " "}
+
+          {/* Button to request by high priority or not */}
+          <div style={{ marginLeft: "60px", marginBottom: "20px" }} align="start">
+            <Button type="primary" shape="round" size='large' onClick={() => (this.toggleHighPriorityState())} > {this.state.highPriority ? "List All" : "List High Priority Only"}</Button>
+          </div>
+
         </Row>
 
         <Row type="flex" justify="space-around">
