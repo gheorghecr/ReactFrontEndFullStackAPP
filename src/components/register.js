@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Form, Input, Button, Upload, Alert} from 'antd';
+import { Form, Input, Button, Upload, message} from 'antd';
 import { status, json } from '../utilities/requestHandlers';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import { withRouter } from 'react-router-dom';
@@ -74,10 +74,10 @@ class RegistrationForm extends React.Component {
 		super(props);
 		this.state = {
 			selectedFile: null,
-			loading: false,
-			success: false, // state to check when to show the alert
-			error: false, // state to check when to show the alert
-			errorMessage: ' ', // error alert message
+			// loading: false,
+			// success: false, // state to check when to show the alert
+			// error: false, // state to check when to show the alert
+			// errorMessage: ' ', // error alert message
 		};
 		this.onFinish = this.onFinish.bind(this);
 		this.onFinishFailed = this.onFinishFailed.bind(this);
@@ -89,7 +89,6 @@ class RegistrationForm extends React.Component {
 	* When user clicks on registering. Post data to the server.
 	*/
 	onFinish = (values) => {
-		console.log('finish')
 		console.log('Received values of form: ', values);
 		const { confirm, ...data } = values;  // ignore the 'confirm' value in data sent
 		
@@ -112,26 +111,17 @@ class RegistrationForm extends React.Component {
 			.then(status)
 			.then(json)
 			.then(dataFromServer => {
-				this.setState({
-					success: true
-				});
-				console.log(dataFromServer);
-				window.scrollTo(0, 0); 
+				message.success('Registered successfully', 4);
 				setTimeout(() => {
 					this.props.history.push('/login')
 				}, 2000);
 				
 			})
 			.catch(error => {
-				window.scrollTo(0, 0); 
-				this.setState({
-					errorMessage: `${JSON.stringify(error.errorMessage)}`,
-					error: true
-				});
+				message.error(`${JSON.stringify(error.errorMessage)}`, 10);
 			});
 	};
 
-	
 
 	/**
 	* When there is as an error on submit.
@@ -190,35 +180,9 @@ class RegistrationForm extends React.Component {
 				<div style={{ marginTop: 8 }}>Upload</div>
 			</div>
 		);
-		
-		/**
-		* Error Alert from ant design.
-		*/
-		const errorMessage = (
-			<Alert
-				message="Error"
-				description= {this.state.errorMessage}
-				type="error"
-				showIcon
-			/>
-		);
-
-		/**
-		* Success Alert from ant design.
-		*/
-		const successMessage = (
-			<Alert
-				message="Registered successfully!"
-				description="You will be redirected to login page."
-				type="success"
-				showIcon
-			/>
-		);
 
 		return (
 			<>
-				{this.state.success ? <div>{successMessage}</div> : ''}  {/* Show success message when user registered successfully*/}
-				{this.state.error ? <div>{errorMessage}</div> : ''} {/* Show error message when user NOT registered successfully*/}
 
 				<h1 align="middle" style={{ padding: '2% 20%' }}>Register</h1>
 				<Form {...formItemLayout} name="register"  onFinish={this.onFinish} scrollToFirstError onFinishFailed={this.onFinishFailed}>

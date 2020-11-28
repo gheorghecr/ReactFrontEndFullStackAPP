@@ -1,7 +1,7 @@
 import React from 'react';
 import UserContext from '../contexts/user';
 
-import { Form, Input, Button, Upload, Alert, Select, InputNumber } from 'antd';
+import { Form, Input, Button, Upload, Select, InputNumber, message } from 'antd';
 import { status, json } from '../utilities/requestHandlers';
 import { UploadOutlined } from '@ant-design/icons';
 import { withRouter } from 'react-router-dom';
@@ -43,9 +43,6 @@ class AddPropertyForm extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			success: false, // state to check when to show the alert
-			error: false, // state to check when to show the alert
-			errorMessage: ' ', // error alert message
 			fileList: [],
 		};
 		this.onFinish = this.onFinish.bind(this);
@@ -85,22 +82,14 @@ class AddPropertyForm extends React.Component {
 			.then(status)
 			.then(json)
 			.then(dataFromServer => {
-				this.setState({
-					success: true
-				});
-				console.log(dataFromServer);
-				window.scrollTo(0, 0);
+				message.success('Property added successfully', 4);
 				setTimeout(() => {
 					this.props.history.push('/')
 				}, 2000);
 
 			})
 			.catch(error => {
-				window.scrollTo(0, 0);
-				this.setState({
-					errorMessage: `${JSON.stringify(error.errorMessage)}`,
-					error: true
-				});
+				message.error(`${JSON.stringify(error.errorMessage)}`, 10);
 			});
 	};
 
@@ -125,31 +114,6 @@ class AddPropertyForm extends React.Component {
 	}
 
 	render() {
-		const { loading } = this.state;
-
-		/**
-		* Error Alert from ant design.
-		*/
-		const errorMessage = (
-			<Alert
-				message="Error"
-				description={this.state.errorMessage}
-				type="error"
-				showIcon
-			/>
-		);
-
-		/**
-		* Success Alert from ant design.
-		*/
-		const successMessage = (
-			<Alert
-				message="Property added successfully!"
-				description=""
-				type="success"
-				showIcon
-			/>
-		);
 
 		const photosActions = {
 			onChange: this.onChange,
@@ -158,8 +122,6 @@ class AddPropertyForm extends React.Component {
 
 		return (
 			<>
-				{this.state.success ? <div>{successMessage}</div> : ''}  {/* Show success message when property added successfully*/}
-				{this.state.error ? <div>{errorMessage}</div> : ''} {/* Show error message when property NOT added  successfully*/}
 
 				<h1 align="middle" style={{ padding: '2% 20%' }}>Add property</h1>
 				<Form {...formItemLayout} name="register" onFinish={this.onFinish} scrollToFirstError onFinishFailed={this.onFinishFailed}>

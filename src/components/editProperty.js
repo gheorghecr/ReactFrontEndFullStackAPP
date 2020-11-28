@@ -1,6 +1,6 @@
 import UserContext from '../contexts/user';
 import React from 'react';
-import { Form, Input, Button, Upload, Alert, Select, InputNumber, Row, Image, } from 'antd';
+import { Form, Input, Button, Upload, Select, InputNumber, Row, Image, message } from 'antd';
 import { status, json } from '../utilities/requestHandlers';
 import { UploadOutlined, DeleteOutlined } from '@ant-design/icons';
 import { withRouter } from 'react-router-dom';
@@ -43,9 +43,6 @@ class EditProperty extends React.Component {
     super(props);
     this.state = {
       prop_ID: this.props.location.state.prop_ID,
-      success: false, // state to check when to show the alert
-      error: false, // state to check when to show the alert
-      errorMessage: ' ', // error alert message
       fileList: [],
     };
     this.onFinish = this.onFinish.bind(this);
@@ -68,7 +65,6 @@ class EditProperty extends React.Component {
       .then(status)
       .then(json)
       .then(dataFromServer => {
-        console.log(dataFromServer[0], 'sdsds')
         this.setState({
           propertyObject: dataFromServer[0]
         });
@@ -95,13 +91,12 @@ class EditProperty extends React.Component {
       .then(status)
       .then(json)
       .then(dataFromServer => {
-        console.log(dataFromServer, 'images')
         this.setState({
           propertyImagesName: dataFromServer
         });
       })
       .catch(error => {
-        
+        message.error(`Could not retrieve the images`, 5);
       });
   }
 
@@ -119,14 +114,12 @@ class EditProperty extends React.Component {
       .then(status)
       .then(json)
       .then(dataFromServer => {
-        console.log(dataFromServer, 'images delete function')
         this.deleteImageFromImagesObject(imageID);
+        message.success('Image deleted successfully', 4);
       })
+
       .catch(error => {
-        this.setState({
-          errorMessage: `Error deleting image! Please try again!`,
-          error: true
-        });
+        message.error(`Error deleting image! Please try again!`, 6);
       });
   }
 
@@ -149,12 +142,6 @@ class EditProperty extends React.Component {
   * When user clicks on registering. Post data to the server.
   */
   onFinish = (values) => {
-    // remove error or success popUP message if there are any
-    this.setState({
-      error: false,
-      success: false,
-    })
-
     console.log('Received values of add property form: ', values);
     const { confirm, ...data } = values;  // ignore the 'confirm' value in data sent
 
@@ -199,23 +186,14 @@ class EditProperty extends React.Component {
       .then(status)
       .then(json)
       .then(dataFromServer => {
-        this.setState({
-          success: true,
-          successMessage: 'Property updated successfully! Page will refresh automatically ...'
-        });
-        console.log(dataFromServer);
-        window.scrollTo(0, 0);
+        message.success('Property updated successfully! Page will refresh automatically ...', 4);
         setTimeout(() => {
 					this.componentWillMount()
 				}, 1000);
         
       })
       .catch(error => {
-        window.scrollTo(0, 0);
-        this.setState({
-          errorMessage: `${JSON.stringify(error.errorMessage)}`,
-          error: true
-        });
+        message.error(`${JSON.stringify(error.errorMessage)}`, 10);
       });
   };
 
@@ -236,34 +214,9 @@ class EditProperty extends React.Component {
         fileList: fileList
       })
     }
-    console.log(this.state.fileList)
   }
 
   render() {
-    /**
-    * Error Alert from ant design.
-    */
-    const errorMessage = (
-      <Alert
-        message="Error"
-        description={this.state.errorMessage}
-        type="error"
-        showIcon
-      />
-    );
-
-    /**
-    * Success Alert from ant design.
-    */
-    const successMessage = (
-      <Alert
-        message="Property added successfully!"
-        description=""
-        type="success"
-        showIcon
-      />
-    );
-
     const photosActions = {
       onChange: this.onChange,
       beforeUpload: () => false // upload manually
@@ -312,9 +265,6 @@ class EditProperty extends React.Component {
     return (
       <>
 
-        {this.state.success ? <div>{successMessage}</div> : ''}  {/* Show success message when property added successfully*/}
-        {this.state.error ? <div>{errorMessage}</div> : ''} {/* Show error message when property NOT added  successfully*/}
-
         <h1 align="middle" style={{ padding: '2% 20%' }}>Edit property</h1>
         <Form {...formItemLayout} name="register" onFinish={this.onFinish} scrollToFirstError onFinishFailed={this.onFinishFailed} >
           <Form.Item name="title" label="Title" rules={titleRules} required tooltip="This is a required field" initialValue={this.state.propertyObject.title}>
@@ -342,7 +292,7 @@ class EditProperty extends React.Component {
             </Select>
           </Form.Item>
           <Form.Item name="status" label="Status" tooltip="Status of the property?">
-            <Select style={{ width: '20%' }} defaultValue={this.state.propertyObject.status ? 'Under Offer' : 'Sold'} >
+            <Select style={{ width: '25%' }} defaultValue={this.state.propertyObject.status ? 'Under Offer' : 'Sold'} >
               <Option value="For Sale">For Sale</Option>
               <Option value="Under Offer">Under Offer</Option>
               <Option value="Sold">Sold</Option>
