@@ -2,7 +2,7 @@ import React from 'react';
 import { status, json } from '../utilities/requestHandlers';
 import UserContext from '../contexts/user';
 import { Card, Carousel, Image, Button } from 'antd';
-import { EditOutlined, MessageOutlined, DeleteOutlined, ExclamationCircleOutlined, EyeOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, ExclamationCircleOutlined, EyeOutlined } from '@ant-design/icons';
 
 const { Meta } = Card;
 
