@@ -1,7 +1,7 @@
 import React from 'react';
 import { status, json } from '../utilities/requestHandlers';
 import UserContext from '../contexts/user';
-import { Card, Button } from 'antd';
+import { Card, Button, Popconfirm, message } from 'antd';
 
 const { Meta } = Card;
 
@@ -14,6 +14,8 @@ class PropertyCard extends React.Component {
       archived: this.props.archived ? true : false, // if message is archived or not
     };
     this.toggleArchived = this.toggleArchived.bind(this);
+    this.confirm = this.confirm.bind(this);
+    this.cancel = this.cancel.bind(this);
   }
 
   static contextType = UserContext;
@@ -65,14 +67,33 @@ class PropertyCard extends React.Component {
       });
   }
 
+  // on deletion of property
+  confirm(e) {
+    this.props.deleteMessageFromMessageList(this.props.messageID)
+    message.success('Click on Yes');
+  }
+
+  // Cancel deletion
+  cancel(e) {
+  }
+
   render() {
     // Actions on the bottom of the card.
     const cardActions =
       [
         <Button type="ghost" shape="round" size='large' onClick={() => (this.toggleArchived())}>
           {this.state.archived ? 'Unarchive Message' : 'Archive Message'} </Button>,
-        <Button style={{ color: 'red' }} type="ghost" shape="round" size='large' onClick={() => (this.props.deleteMessageFromMessageList(this.props.messageID))}  >
-          Delete Message</Button>
+
+        <Popconfirm
+          title="Are you sure to delete this message?"
+          onConfirm={this.confirm}
+          onCancel={this.cancel}
+          okText="Yes"
+          cancelText="No"
+        >
+          <Button style={{ color: 'red' }} type="ghost" shape="round" size='large'  >
+            Delete Message</Button>
+        </Popconfirm>
       ];
 
     return (

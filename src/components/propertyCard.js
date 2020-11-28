@@ -1,7 +1,7 @@
 import React from 'react';
 import { status, json } from '../utilities/requestHandlers';
 import UserContext from '../contexts/user';
-import { Card, Carousel, Image, Button } from 'antd';
+import { Card, Carousel, Image, Button, Popconfirm, message } from 'antd';
 import { EditOutlined, DeleteOutlined, ExclamationCircleOutlined, EyeOutlined } from '@ant-design/icons';
 
 const { Meta } = Card;
@@ -17,14 +17,16 @@ class PropertyCard extends React.Component {
     };
     this.toggleHighPriority = this.toggleHighPriority.bind(this);
     this.toggleHighVisibility = this.toggleHighVisibility.bind(this);
+    this.confirm = this.confirm.bind(this);
+    this.cancel = this.cancel.bind(this);
   }
 
   static contextType = UserContext;
-  
+
   /**
   * This will retrieve the image names from the server. And store it.
   */
-   componentDidMount() {
+  componentDidMount() {
     fetch(`https://maximum-arena-3000.codio-box.uk/api/images/${this.state.prop_ID}`, {
       method: "GET",
       body: null,
@@ -41,9 +43,9 @@ class PropertyCard extends React.Component {
         });
       })
       .catch(error => {
-        
+
       });
-   } 
+  }
 
   /**
    * Function that toggles the High Priority attribute for a property
@@ -95,6 +97,16 @@ class PropertyCard extends React.Component {
       });
   }
 
+  confirm(e) {
+    console.log(this.props)
+    this.props.deleteProperty(this.props.prop_ID)
+    message.success('Click on Yes');
+  }
+
+  // Cancel deletion
+  cancel(e) {
+  }
+
   render() {
     let cardActions;
     // Render different card actions depending if who is logged in is normal user 
@@ -104,29 +116,38 @@ class PropertyCard extends React.Component {
     if (this.context.user.role === 'admin') {
       cardActions =
         [
-          <EditOutlined 
-            key="edit" 
-            style={{ color: 'steelblue' }} 
+          <EditOutlined
+            key="edit"
+            style={{ color: 'steelblue' }}
             onClick={() => (history.push({
               pathname: '/editProperty',
-              state: {prop_ID: this.props.prop_ID}
-            }))} 
+              state: { prop_ID: this.props.prop_ID }
+            }))}
           />,
-          <ExclamationCircleOutlined 
-            key="markHighPriority" 
-            onClick={() => (this.toggleHighPriority())} 
-            style={{ color: this.state.highPriority ? 'red' : 'steelblue' }} 
+          <ExclamationCircleOutlined
+            key="markHighPriority"
+            onClick={() => (this.toggleHighPriority())}
+            style={{ color: this.state.highPriority ? 'red' : 'steelblue' }}
           />,
-          <EyeOutlined 
-            key="markHighPriority" 
-            onClick={() => (this.toggleHighVisibility())} 
-            style={{ color: this.state.visibility ? 'green' : 'red' }} 
+          <EyeOutlined
+            key="markHighPriority"
+            onClick={() => (this.toggleHighVisibility())}
+            style={{ color: this.state.visibility ? 'green' : 'red' }}
           />,
-          <DeleteOutlined 
-            key="delete" 
-            onClick={() => (this.props.deleteProperty(this.props.prop_ID))} 
-            style={{ color: 'steelblue' }} 
-          />
+          // delete button is wrapped into a popConfirm, to make sure the user wanted to delete the property
+          <Popconfirm
+            title="Are you sure to delete this property?"
+            onConfirm={this.confirm}
+            onCancel={this.cancel}
+            okText="Yes"
+            cancelText="No"
+          >
+            <DeleteOutlined
+              key="delete"
+              //onClick={() => (this.props.deleteProperty(this.props.prop_ID))}
+              style={{ color: 'steelblue' }}
+            />
+          </Popconfirm>
         ];
     } else {
       cardActions =
@@ -162,8 +183,8 @@ class PropertyCard extends React.Component {
           <Carousel autoplay dotPosition={'top'}>
             {photoList}
           </Carousel>
-          <Meta 
-            style = {{  marginTop : 30}}
+          <Meta
+            style={{ marginTop: 30 }}
             title={this.props.title}
           />
           <br></br>
@@ -175,10 +196,10 @@ class PropertyCard extends React.Component {
           <div align="center">
             <Button type="primary" shape="round" size='large' onClick={() => (history.push({
               pathname: '/propertyDetails',
-              state: {prop_ID: this.props.prop_ID}
+              state: { prop_ID: this.props.prop_ID }
             }))} > View Details </Button>
           </div>
-          
+
         </Card>
       </>
     );
