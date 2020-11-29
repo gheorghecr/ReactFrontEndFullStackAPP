@@ -1,9 +1,11 @@
 import React from 'react';
 import UserContext from '../contexts/user';
-import { Col, Row, Button, message } from 'antd';
+import { Col, Row, Button, message, Input, PageHeader } from 'antd';
 import { withRouter } from 'react-router-dom';
 import PropertyCard from './propertyCard';
 import { status, json } from '../utilities/requestHandlers';
+
+const { Search } = Input;
 class RealEstateGrid extends React.Component {
 
   constructor(props) {
@@ -12,6 +14,7 @@ class RealEstateGrid extends React.Component {
       posts: [],
       loading: true,
       highPriority: false, // used to know when the user is filtering by high Priority or not
+      previousValueOnSearch: this.props.searchValue,
     }
     this.toggleHighPriorityState = this.toggleHighPriorityState.bind(this);
     this.componentDidMount = this.componentDidMount.bind(this);
@@ -77,8 +80,6 @@ class RealEstateGrid extends React.Component {
       }
     }
 
-    console.log(fetchLink, 'fetch link')
-
     fetch(fetchLink, {
       method: "GET",
       body: null,
@@ -127,8 +128,59 @@ class RealEstateGrid extends React.Component {
     }, 500);
   }
 
-  render() {
 
+  /**
+  * When a user clicks on search this gets triggered and then requests the server for properties.
+  * Using the search query.
+  * 
+  * @param {string} value - Search text.
+  */
+  handleChange = value => {
+    this.setState({
+      loading: true,
+    })
+
+    let fetchLink;
+    // Fetch request depends on the user role and if is filtered high priority or not
+    if (this.context.user.role === 'admin') {
+        fetchLink = `https://maximum-arena-3000.codio-box.uk/api/properties/search/admin?q=${value}`;
+    } else {
+        fetchLink = `https://maximum-arena-3000.codio-box.uk/api/properties/search?q=${value}`;
+    }
+
+    console.log(fetchLink)
+
+    fetch(fetchLink, {
+      method: "GET",
+      body: null,
+      headers: {
+        "Authorization": "Basic " + btoa(this.context.user.username + ":" + this.context.user.password)
+      }
+    })
+      .then(status)
+      .then(json)
+      .then(data => {
+        console.log(data)
+        this.setState({ posts: data })
+        this.setState({ loading: false })
+      })
+      .catch(error => {
+        console.log("Error fetching properties", error);
+        if (error.message === 'No properties available' || error.message === 'No properties available marked as High Priority') {
+          message.error('No properties found with that search query', 3)
+          this.setState({
+            loading: false,
+          })
+        } else {
+          this.setState({
+            loading: false,
+          })
+          message.error(error.message, 5)
+        }
+      });
+  };
+
+  render() {
     // Show loading post while loading the data from the server
     if (!this.state.posts.length && this.state.loading === true) {
       return (
@@ -213,6 +265,17 @@ class RealEstateGrid extends React.Component {
 
     return (
       <>
+
+        <div style={{ padding: '2% 20%' }}>
+          <Search placeholder="Input search text, you can search by title, description or location"
+            allowClear
+            enterButton="Search"
+            size="large"
+            onSearch={this.handleChange} />
+          <PageHeader className="site-page-header"
+            title="Real Estate"
+            subTitle="Real Estate APP" />
+        </div>
 
         <Row type="flex" justify="space-around">
           {/* Show the add a property button only if an admin is logged in */}
