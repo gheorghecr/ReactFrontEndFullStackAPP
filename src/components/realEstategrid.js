@@ -143,9 +143,9 @@ class RealEstateGrid extends React.Component {
     let fetchLink;
     // Fetch request depends on the user role and if is filtered high priority or not
     if (this.context.user.role === 'admin') {
-        fetchLink = `https://maximum-arena-3000.codio-box.uk/api/properties/search/admin?q=${value}`;
+      fetchLink = `https://maximum-arena-3000.codio-box.uk/api/properties/search/admin?q=${value}`;
     } else {
-        fetchLink = `https://maximum-arena-3000.codio-box.uk/api/properties/search?q=${value}`;
+      fetchLink = `https://maximum-arena-3000.codio-box.uk/api/properties/search?q=${value}`;
     }
 
     console.log(fetchLink)
@@ -265,7 +265,7 @@ class RealEstateGrid extends React.Component {
 
     return (
       <>
-
+        {/* Search bar for the real estate grid app */}
         <div style={{ padding: '2% 20%' }}>
           <Search placeholder="Input search text, you can search by title, description or location"
             allowClear
