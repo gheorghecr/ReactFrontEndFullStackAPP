@@ -13,7 +13,7 @@ render() {
   return (
     <>
       <div className="site-layout-content">
-        <RealEstateGrid searchValue={this.state.value}/>
+        <RealEstateGrid/>
       </div>
     </>  
   );
