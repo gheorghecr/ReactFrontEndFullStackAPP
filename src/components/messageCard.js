@@ -1,6 +1,7 @@
 import React from 'react';
 import { status, json } from '../utilities/requestHandlers';
 import UserContext from '../contexts/user';
+import { withRouter } from 'react-router-dom';
 import { Card, Button, Popconfirm, message } from 'antd';
 
 const { Meta } = Card;
@@ -55,6 +56,7 @@ class PropertyCard extends React.Component {
   }
 
   render() {
+
     // Actions on the bottom of the card.
     const cardActions =
       [
@@ -90,10 +92,18 @@ class PropertyCard extends React.Component {
           <p>From Number: {this.props.fromNumber} </p>
           <p>Message: {this.props.messageText}</p>
           {this.state.archived ? <p>Message Archived</p> : ''}
+          
+          <div align="center">
+            <Button type="ghost" shape="round" size='large' onClick={() => (this.props.history.push({
+              pathname: '/propertyDetails',
+              state: { prop_ID: this.props.propertyID }
+            }))}>
+            View property in question </Button>
+          </div>
         </Card>
       </>
     );
   }
 }
 
-export default PropertyCard; 
+export default withRouter (PropertyCard); 
