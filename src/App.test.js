@@ -63,39 +63,9 @@ describe('App Menu Role', () => {
   });
 });
 
-// describe('App MenuItem Role', () => {
-//   test('renders App component and checks for role menuItem', () => {
-//     render(<App />);
-//     expect(screen.getByRole('menuitem')).toBeInTheDocument();
-//   });
-// });
-
 describe('App Button Role', () => {
   test('renders App component and checks for role Button', () => {
     render(<App />);
     expect(screen.getByRole('button')).toBeInTheDocument();
   });
 });
-
-
-// TODO fdsafsdafsdfas mudafdsafas para outro ficheiror
-
-// describe('RealEstateGrid', () => {
-//   test('renders RealEstateGrid component', () => {
-//         render(<RegistrationForm />);
-//     screen.debug();
-//   })
-// })
-
-
-describe('Registration form', () => {
-  test('Renders registration form and check for the register text', () => {
-    render(<RegistrationForm />);
-    //const input = screen.getByLabelText('Select your avatar')
-    //console.log(input)
-    //expect(input).toHaveDisplayValue('Select your avatar')
-    //(screen.getByLabelText('Select your avatar')).toBeInTheDocument();
-    // expect(screen.getByRole('button')).toBeInTheDocument();
-    screen.debug();
-  })
-})
