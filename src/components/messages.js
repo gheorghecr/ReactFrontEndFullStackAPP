@@ -26,7 +26,6 @@ class Messages extends React.Component {
   * Fetch all the messages for the current user.
   */
   componentDidMount() {
-    console.log(this.state, 'state here component')
     fetch(`https://maximum-arena-3000.codio-box.uk/api/messages/agent/${this.context.user.userID}`, {
       method: "GET",
       body: null,
@@ -90,7 +89,6 @@ class Messages extends React.Component {
   }
 
   render() {
-    console.log(this.state, 'state here')
     const cardList = this.state.messages.map(messageObject => {
       return (
         <div style={{ padding: "10px" }} key={messageObject.messageID}>
