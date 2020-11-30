@@ -314,4 +314,4 @@ class RealEstateGrid extends React.Component {
 }
 
 
-export default withRouter(RealEstateGrid);
+export default RealEstateGrid;

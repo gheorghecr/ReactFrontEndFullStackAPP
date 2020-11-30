@@ -228,4 +228,4 @@ class RegistrationForm extends React.Component {
 	}
 }
 
-export default withRouter(RegistrationForm);
+export default RegistrationForm;
