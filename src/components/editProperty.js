@@ -50,6 +50,10 @@ class EditProperty extends React.Component {
     this.onChange = this.onChange.bind(this);
     this.deleteImage = this.deleteImage.bind(this);
     this.deleteImageFromImagesObject = this.deleteImageFromImagesObject.bind(this);
+    this.getCategories = this.getCategories.bind(this);
+    this.getFeatures = this.getFeatures.bind(this);
+    this.deleteCategory = this.deleteCategory.bind(this);
+    this.deleteFeatures = this.deleteFeatures.bind(this);
   }
 
   static contextType = UserContext;
@@ -69,6 +73,8 @@ class EditProperty extends React.Component {
           propertyObject: dataFromServer[0]
         });
         this.getImagesName();
+        this.getCategories();
+        this.getFeatures();
       })
       .catch(error => {
         setTimeout(() => {
@@ -198,6 +204,100 @@ class EditProperty extends React.Component {
   };
 
   /**
+	* Deletes the feature from the property by the propertyFeatureID.
+	*/
+	deleteFeatures(propertyFeatureID) {
+		fetch(`https://maximum-arena-3000.codio-box.uk/api/features/propertyFeatures/${propertyFeatureID}`, {
+			method: "DELETE",
+			body: null,
+			headers: {
+				"Authorization": "Basic " + btoa(this.context.user.username + ":" + this.context.user.password)
+			}
+		})
+			.then(status)
+			.then(json)
+			.then(dataFromServer => {
+				this.componentWillMount();
+			})
+			.catch(error => {
+				console.log(error)
+				message.error('Could not delete the feature. Try Again!', 5);
+			});
+	}
+
+	/**
+	* Deletes the category from the property by the propertyCategoryID.
+	*/
+	deleteCategory(propertyCategoryID) {
+		fetch(`https://maximum-arena-3000.codio-box.uk/api/categories/propertyCategory/${propertyCategoryID}`, {
+			method: "DELETE",
+			body: null,
+			headers: {
+				"Authorization": "Basic " + btoa(this.context.user.username + ":" + this.context.user.password)
+			}
+		})
+			.then(status)
+			.then(json)
+			.then(dataFromServer => {
+				this.componentWillMount();
+			})
+			.catch(error => {
+				console.log(error)
+				message.error('Could not delete the category. Try Again!', 5);
+			});
+	}
+
+  /**
+	* Gets the features for this property from the server.
+	*/
+	getFeatures() {
+		fetch(`https://maximum-arena-3000.codio-box.uk/api/features/${this.state.prop_ID}`, {
+			method: "GET",
+			body: null,
+			headers: {
+				"Authorization": "Basic " + btoa(this.context.user.username + ":" + this.context.user.password)
+			}
+		})
+			.then(status)
+			.then(json)
+			.then(dataFromServer => {
+				this.setState({
+					features: dataFromServer,
+				});
+				console.log(dataFromServer, 'features here')
+			})
+			.catch(error => {
+				console.log(error)
+				message.error('Could not get the features. Try Again!', 5);
+			});
+	}
+
+	/**
+	* Gets the  categories for this property from the server.
+	*/
+	getCategories() {
+		fetch(`https://maximum-arena-3000.codio-box.uk/api/categories/${this.state.prop_ID}`, {
+			method: "GET",
+			body: null,
+			headers: {
+				"Authorization": "Basic " + btoa(this.context.user.username + ":" + this.context.user.password)
+			}
+		})
+			.then(status)
+			.then(json)
+			.then(dataFromServer => {
+				this.setState({
+					categories: dataFromServer,
+				});
+				console.log(dataFromServer, 'categories here')
+			})
+			.catch(error => {
+				console.log(error)
+				message.error('Could not get the categories. Try Again!', 5);
+			});
+	}
+
+  /**
   * When there is as an error on submit.
   */
   onFinishFailed = (errorInfo) => {
@@ -262,6 +362,50 @@ class EditProperty extends React.Component {
       });
     }
 
+
+    let featuresObject = [];
+    let categoriesObject = [];
+
+    // map all available features only if they exist
+    if (this.state.features) {
+      featuresObject = this.state.features.map(feature => {
+        return (
+          <div>
+            <div>
+              <h5>{feature.name.toUpperCase()}</h5>
+            </div>
+            <div align='center'>
+              <DeleteOutlined
+                key='delete'
+                onClick={() => (this.deleteFeatures(feature.propertyFeatureID))}
+                style={{ color: 'red', fontSize: '20px', padding: '2% 20%' }}
+              />
+            </div>
+          </div>
+        )
+      });
+    }
+
+    // map all available features only if they exist
+    if (this.state.categories) {
+      categoriesObject = this.state.categories.map(category => {
+        return (
+          <div>
+            <div>
+              <h5>{category.name.replace('_', ' ').toUpperCase()}</h5>
+            </div>
+            <div align='center'>
+              <DeleteOutlined
+                key='delete'
+                onClick={() => (this.deleteCategory(category.propertyCategoryID))}
+                style={{ color: 'red', fontSize: '20px', padding: '2% 20%' }}
+              />
+            </div>
+          </div>
+        )
+      });
+    }
+
     return (
       <>
 
@@ -309,9 +453,19 @@ class EditProperty extends React.Component {
 					</Button>
           </Form.Item>
         </Form>
+       
         {propertyImagesHeader}
         <Row type="flex" justify="space-around">
           {photoList}
+        </Row>
+
+        <h1 align="middle" style={{ padding: '2% 20%' }}>Categories</h1>
+        <Row type="flex" justify="space-around">
+          {categoriesObject}
+        </Row>
+        <h1 align="middle" style={{ padding: '2% 20%' }}>Features</h1>
+        <Row type="flex" justify="space-around">
+          {featuresObject}
         </Row>
 
       </>
