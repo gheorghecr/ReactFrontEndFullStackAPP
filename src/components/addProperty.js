@@ -69,7 +69,6 @@ class AddPropertyForm extends React.Component {
 	* Gets the available features from the server. In order to be used when adding a new property.
 	*/
 	getAvailableFeature() {
-		console.log('Get features')
 		fetch(`https://maximum-arena-3000.codio-box.uk/api/features`, {
 			method: "GET",
 			body: null,
@@ -84,7 +83,6 @@ class AddPropertyForm extends React.Component {
 					features: dataFromServer,
 				});
 				console.log(dataFromServer, 'features here')
-				//message.success('Archived property toggled successfully!', 4);
 			})
 			.catch(error => {
 				console.log(error)
@@ -96,7 +94,6 @@ class AddPropertyForm extends React.Component {
 	* Gets the available categories from the server. In order to be used when adding a new property.
 	*/
 	getAvailableCategories() {
-		console.log('Get categories')
 		fetch(`https://maximum-arena-3000.codio-box.uk/api/categories`, {
 			method: "GET",
 			body: null,
@@ -111,7 +108,6 @@ class AddPropertyForm extends React.Component {
 					categories: dataFromServer,
 				});
 				console.log(dataFromServer, 'categories here')
-				//message.success('Archived property toggled successfully!', 4);
 			})
 			.catch(error => {
 				console.log(error)
@@ -301,7 +297,6 @@ class AddPropertyForm extends React.Component {
 
 		// creates the check box options for the categories
 		if (this.state.categories) {
-			console.log('got categories', this.state.categories)
 			for (const category of this.state.categories) {
 				category.name = category.name.replace('_', ' '); // removing underscore from name
 				let categoryObject = { label: category.name, value: category.ID }
