@@ -19,6 +19,8 @@ class PropertyCard extends React.Component {
     this.toggleHighVisibility = this.toggleHighVisibility.bind(this);
     this.confirm = this.confirm.bind(this);
     this.cancel = this.cancel.bind(this);
+    this.getCategories = this.getCategories.bind(this);
+    this.getFeatures = this.getFeatures.bind(this);
   }
 
   static contextType = UserContext;
@@ -40,11 +42,62 @@ class PropertyCard extends React.Component {
         this.setState({
           propertyImagesName: dataFromServer
         });
+
       })
       .catch(error => {
 
       });
   }
+
+  /**
+	* Gets the features for this property from the server.
+	*/
+	getFeatures() {
+		fetch(`https://maximum-arena-3000.codio-box.uk/api/features/${this.props.prop_ID}`, {
+			method: "GET",
+			body: null,
+			headers: {
+				"Authorization": "Basic " + btoa(this.context.user.username + ":" + this.context.user.password)
+			}
+		})
+			.then(status)
+			.then(json)
+			.then(dataFromServer => {
+				this.setState({
+					features: dataFromServer,
+				});
+				console.log(dataFromServer, 'features here')
+			})
+			.catch(error => {
+				console.log(error)
+				message.error('Could not get the features. Try Again!', 5);
+			});
+	}
+
+	/**
+	* Gets the  categories for this property from the server.
+	*/
+	getCategories() {
+		fetch(`https://maximum-arena-3000.codio-box.uk/api/categories/${this.props.prop_ID}`, {
+			method: "GET",
+			body: null,
+			headers: {
+				"Authorization": "Basic " + btoa(this.context.user.username + ":" + this.context.user.password)
+			}
+		})
+			.then(status)
+			.then(json)
+			.then(dataFromServer => {
+				this.setState({
+					categories: dataFromServer,
+				});
+				console.log(dataFromServer, 'categories here')
+			})
+			.catch(error => {
+				console.log(error)
+				message.error('Could not get the categories. Try Again!', 5);
+			});
+	}
 
   /**
    * Function that toggles the High Priority attribute for a property
@@ -109,6 +162,14 @@ class PropertyCard extends React.Component {
     // or an admin.
     const { history } = this.props;
 
+    if (!this.state.categories) {
+      this.getCategories();
+    }
+
+    if (!this.state.features) {
+      this.getFeatures();
+    }
+
     if (this.context.user.role === 'admin') {
       cardActions =
         [
@@ -168,6 +229,24 @@ class PropertyCard extends React.Component {
       });
     }
 
+    let featuresString = '';
+    let categoriesString = '';
+
+    // adds the categories to the categoriesString
+		if (this.state.categories) {
+			for (const category of this.state.categories) {
+				categoriesString += ' ' + category.name 
+			}
+    }
+    
+    // adds the categories to the categoriesString
+		if (this.state.features) {
+			for (const feature of this.state.features) {
+				feature.name = feature.name.replace('_', ' '); // removing underscore from name
+				featuresString += ' ' + feature.name 
+			}
+		}
+
     return (
       <>
         <Card
@@ -186,7 +265,9 @@ class PropertyCard extends React.Component {
           <p>Description: {this.props.description}</p>
           <p>Status: {this.props.status} </p>
           <p>Location: {this.props.location}</p>
-          <p>Price: ${this.props.price}</p>
+          <p>Price: {this.props.price}</p>
+          <p>Categories: {categoriesString.toLocaleUpperCase()}</p>
+          <p>Features: {featuresString.toLocaleUpperCase()}</p>
           {this.state.highPriority ? <p style={{ color: this.state.highPriority ? 'red' : 'steelblue' }}>High Priority!</p> : ''} {/* Show high priority label only when necessary.*/}
           <div align="center">
             <Button type="primary" shape="round" size='large' onClick={() => (history.push({
