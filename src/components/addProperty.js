@@ -186,52 +186,72 @@ class AddPropertyForm extends React.Component {
 	* Send the selected features to the server
 	*/
 	sendFeatures = () => {
-		let data = {propertyID: this.state.dataFromServer.id, featuresID: this.state.featuresSelected};
+		// send features only when there was something selected
+		if (this.state.featuresSelected) {
+			console.log('sending featuyres')
+			let data = { propertyID: this.state.dataFromServer.id, featuresID: this.state.featuresSelected };
 
-		fetch('https://maximum-arena-3000.codio-box.uk/api/features/propertyFeatures', {
-			method: "POST",
-			body: JSON.stringify(data),
-			headers: {
-				"Authorization": "Basic " + btoa(this.context.user.username + ":" + this.context.user.password),
-				"Content-Type": "application/json"
-			}
-		})
-			.then(status)
-			.then(json)
-			.then(dataFromServer => {
-				this.setState({
-					featureSent: true,
-				})
+			fetch('https://maximum-arena-3000.codio-box.uk/api/features/propertyFeatures', {
+				method: "POST",
+				body: JSON.stringify(data),
+				headers: {
+					"Authorization": "Basic " + btoa(this.context.user.username + ":" + this.context.user.password),
+					"Content-Type": "application/json"
+				}
 			})
-			.catch(error => {
-				message.error(`${JSON.stringify(error.errorMessage)}`, 10);
-			});
+				.then(status)
+				.then(json)
+				.then(dataFromServer => {
+					this.setState({
+						featureSent: true,
+					})
+				})
+				.catch(error => {
+					message.error(`${JSON.stringify(error.errorMessage)}`, 10);
+				});
+		} else {
+			// set the state that features where sent (when there are no categories to sent)
+			this.setState({
+				featureSent: true,
+			})
+		}
+
+
 	};
 
 	/**
 	* Send the selected categories to the server
 	*/
 	sendCategories = () => {
-		let data = {propertyID: this.state.dataFromServer.id, categoryID: this.state.categoriesSelected};
+		// send categories only when there was something selected
+		if (this.state.categoriesSelected) {
+			console.log('sent categories')
+			let data = { propertyID: this.state.dataFromServer.id, categoryID: this.state.categoriesSelected };
 
-		fetch('https://maximum-arena-3000.codio-box.uk/api/categories/propertyCategory', {
-			method: "POST",
-			body: JSON.stringify(data),
-			headers: {
-				"Authorization": "Basic " + btoa(this.context.user.username + ":" + this.context.user.password),
-				"Content-Type": "application/json"
-			}
-		})
-			.then(status)
-			.then(json)
-			.then(dataFromServer => {
-				this.setState({
-					categorySent: true,
-				})
+			fetch('https://maximum-arena-3000.codio-box.uk/api/categories/propertyCategory', {
+				method: "POST",
+				body: JSON.stringify(data),
+				headers: {
+					"Authorization": "Basic " + btoa(this.context.user.username + ":" + this.context.user.password),
+					"Content-Type": "application/json"
+				}
 			})
-			.catch(error => {
-				message.error(`${JSON.stringify(error.errorMessage)}`, 10);
-			});
+				.then(status)
+				.then(json)
+				.then(dataFromServer => {
+					this.setState({
+						categorySent: true,
+					})
+				})
+				.catch(error => {
+					message.error(`${JSON.stringify(error.errorMessage)}`, 10);
+				});
+		} else {
+			// set the state that categories where sent (when there are no categories to sent)
+			this.setState({
+				categorySent: true,
+			})
+		}
 	};
 
 	/**
@@ -261,30 +281,30 @@ class AddPropertyForm extends React.Component {
 			beforeUpload: () => false // upload manually
 		};
 
-		if(this.state.categorySent === true && this.state.featureSent === true) {
-			 setTimeout(() => {
+		if (this.state.categorySent === true && this.state.featureSent === true) {
+			setTimeout(() => {
 				this.props.history.push('/')
-			 }, 2000);
+			}, 2000);
 		}
 
 		let featuresOptions = [];
 		let categoriesOptions = [];
 
 		// creates the check box options for the features
-		if(this.state.features) {
-			for (const feature of this.state.features ) {
+		if (this.state.features) {
+			for (const feature of this.state.features) {
 				feature.name = feature.name.replace('_', ' '); // removing underscore from name
-				let featureObject = {label: feature.name, value: feature.ID}
+				let featureObject = { label: feature.name, value: feature.ID }
 				featuresOptions.push(featureObject);
 			}
 		}
 
 		// creates the check box options for the categories
-		if(this.state.categories) {
+		if (this.state.categories) {
 			console.log('got categories', this.state.categories)
-			for (const category of this.state.categories ) {
+			for (const category of this.state.categories) {
 				category.name = category.name.replace('_', ' '); // removing underscore from name
-				let categoryObject = {label: category.name, value: category.ID}
+				let categoryObject = { label: category.name, value: category.ID }
 				categoriesOptions.push(categoryObject);
 			}
 		}
@@ -326,10 +346,10 @@ class AddPropertyForm extends React.Component {
 						</Select>
 					</Form.Item>
 					<Form.Item name="features" label="Select property features:" >
-						<Checkbox.Group options={featuresOptions} onChange={this.featuresCheckboxChanged}/>
+						<Checkbox.Group options={featuresOptions} onChange={this.featuresCheckboxChanged} />
 					</Form.Item>
 					<Form.Item name="categories" label="Select property categories:" >
-						<Checkbox.Group options={categoriesOptions}  onChange={this.categoriesCheckboxChanged}/>
+						<Checkbox.Group options={categoriesOptions} onChange={this.categoriesCheckboxChanged} />
 					</Form.Item>
 					<Form.Item name="file" label="Select property images:" >
 						<Upload {...photosActions}>
