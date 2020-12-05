@@ -40,6 +40,8 @@ class EditProperty extends React.Component {
     };
     this.onFinish = this.onFinish.bind(this);
     this.componentWillMount = this.componentWillMount.bind(this);
+    this.getCategories = this.getCategories.bind(this);
+    this.getFeatures = this.getFeatures.bind(this);
   }
 
   static contextType = UserContext;
@@ -59,10 +61,62 @@ class EditProperty extends React.Component {
           propertyObject: dataFromServer[0]
         });
         this.getImagesName();
+        this.getCategories();
+        this.getFeatures();
       })
       .catch(error => {
       });
   }
+
+  /**
+	* Gets the features for this property from the server.
+	*/
+	getFeatures() {
+		fetch(`https://maximum-arena-3000.codio-box.uk/api/features/${this.state.prop_ID}`, {
+			method: "GET",
+			body: null,
+			headers: {
+				"Authorization": "Basic " + btoa(this.context.user.username + ":" + this.context.user.password)
+			}
+		})
+			.then(status)
+			.then(json)
+			.then(dataFromServer => {
+				this.setState({
+					features: dataFromServer,
+				});
+				console.log(dataFromServer, 'features here')
+			})
+			.catch(error => {
+				console.log(error)
+				message.error('Could not get the features. Try Again!', 5);
+			});
+	}
+
+	/**
+	* Gets the  categories for this property from the server.
+	*/
+	getCategories() {
+		fetch(`https://maximum-arena-3000.codio-box.uk/api/categories/${this.state.prop_ID}`, {
+			method: "GET",
+			body: null,
+			headers: {
+				"Authorization": "Basic " + btoa(this.context.user.username + ":" + this.context.user.password)
+			}
+		})
+			.then(status)
+			.then(json)
+			.then(dataFromServer => {
+				this.setState({
+					categories: dataFromServer,
+				});
+				console.log(dataFromServer, 'categories here')
+			})
+			.catch(error => {
+				console.log(error)
+				message.error('Could not get the categories. Try Again!', 5);
+			});
+	}
 
   /**
   * This will retrieve the image names from the server. And store it.
@@ -100,13 +154,9 @@ class EditProperty extends React.Component {
     console.log('Received values of add property form: ', values);
     const { confirm, ...data } = values;  // ignore the 'confirm' value in data sent
 
-    console.log(data);
-
     if(typeof data.fromNumber === 'undefined') {
       delete data.fromNumber; //Don't send this as user did not input the numer
     }
-
-    console.log(data);
 
     data.propertyID = this.state.prop_ID
     data.agentID = this.state.propertyObject.sellerID
@@ -156,6 +206,25 @@ class EditProperty extends React.Component {
       });
     }
 
+    let featuresString = '';
+    let categoriesString = '';
+
+    // adds the categories to the categoriesString
+		if (this.state.categories) {
+			for (const category of this.state.categories) {
+				categoriesString += ' ' + category.name 
+			}
+    }
+    
+    // adds the categories to the categoriesString
+		if (this.state.features) {
+			for (const feature of this.state.features) {
+				feature.name = feature.name.replace('_', ' '); // removing underscore from name
+				featuresString += ' ' + feature.name 
+			}
+		}
+
+
     return (
       <>
         <h1 align="middle" style={{ padding: '2% 20%' }}>{this.state.propertyObject.title}</h1>
@@ -177,6 +246,12 @@ class EditProperty extends React.Component {
           </Form.Item>
           <Form.Item label="High Priority">
             <p1>{this.state.propertyObject.highPriority ? 'Yes' : 'No'}</p1>
+          </Form.Item>
+          <Form.Item label="Category">
+            <p1>{categoriesString.toLocaleUpperCase()}</p1>
+          </Form.Item>
+          <Form.Item label="Features">
+            <p1>{featuresString.toLocaleUpperCase()}</p1>
           </Form.Item>
           <Form.Item {...tailFormItemLayout}>
           </Form.Item>
