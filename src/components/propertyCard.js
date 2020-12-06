@@ -220,7 +220,6 @@ class PropertyCard extends React.Component {
           <div>
             <div>
               <Image
-                width={200}
                 src={`https://maximum-arena-3000.codio-box.uk/${image.imageName}`}
               />
             </div>

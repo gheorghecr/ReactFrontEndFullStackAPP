@@ -197,7 +197,7 @@ class EditProperty extends React.Component {
           <div>
             <div>
               <Image
-                width={200}
+                width={800}
                 src={`https://maximum-arena-3000.codio-box.uk/${image.imageName}`}
               />
             </div>
