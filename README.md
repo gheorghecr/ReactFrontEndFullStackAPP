@@ -1,6 +1,5 @@
-# Gheorghe Craciun (craciun2@uni.coventry.ac.uk)
-## 304CEM Frontend Assignment
-All of the mandatory features are implemented in the frontend and backend.
+
+## FrontEnd Real Estate APP
 
 Accounts already present:
 
